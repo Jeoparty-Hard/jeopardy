@@ -1,0 +1,3 @@
+[submodule "mediator"]
+	path = mediator
+	url = gitlab@git.brn.li:jeopardy/mediator.git
