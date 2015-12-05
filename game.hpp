@@ -3,6 +3,10 @@
 
 #include <list>
 
+#include "player.hpp"
+#include "category.hpp"
+#include "mediator/buzzergroup_manager.hpp"
+
 class game
 {
 public:
@@ -14,6 +18,10 @@ public:
         ANSWER
     };
 private:
+    state state;
+    std::list<player> players;
+    std::vector<category> categories;
+    buzzergroup_manager buzzer;
 public:
 
 };
