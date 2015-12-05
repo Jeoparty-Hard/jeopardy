@@ -1,20 +1,22 @@
 #include "answer.hpp"
 
 #include <vector>
+#include <boost/filesystem/fstream.hpp>
 
 using namespace std;
 using namespace boost::filesystem;
 using namespace rapidjson;
 
-answer::answer(const GenericValue<UTF8<>> &answer, path category_path)
+answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned int points)
 {
     this->type = answer["type"].GetString();
+    this->points = points;
     if (type == "text") {
         this->data = answer["data"].GetString();
     }
     else {
         string filename = answer["data"].GetString();
-        fstream file(category_path / filename, ios::ate | ios::binary);
+        boost::filesystem::ifstream file(category_path / filename, ios::ate | ios::binary);
         auto size = file.tellg();
         file.seekg(0);
         vector<char> buffer(size);
@@ -25,12 +27,12 @@ answer::answer(const GenericValue<UTF8<>> &answer, path category_path)
     this->data = data;
 }
 
-string getType() const
+string answer::getType() const
 {
     return type;
 }
 
-string getData() const
+string answer::getData() const
 {
     return data;
 }

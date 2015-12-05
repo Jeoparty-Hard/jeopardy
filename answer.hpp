@@ -9,9 +9,11 @@ class answer
 {
 private:
     std::string type;
+    unsigned int points;
     std::string data;
 public:
-    answer(const rapidjson::GenericValue<UTF8<>> &, boost::filesystem::path category_path);
+    answer() = default;
+    answer(const rapidjson::GenericValue<rapidjson::UTF8<>> &, boost::filesystem::path category_path, unsigned int points);
     std::string getType() const;
     std::string getData() const;
 };
