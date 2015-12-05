@@ -1,5 +1,5 @@
-#ifndef MEDIATOR_EVENT_H
-#define MEDIATOR_EVENT_H
+#ifndef JEOPARDY_DATA_EVENT_H
+#define JEOPARDY_DATA_EVENT_H
 
 #include <list>
 #include <functional>
@@ -27,4 +27,4 @@ public:
 };
 
 
-#endif //MEDIATOR_EVENT_H
+#endif //JEOPARDY_DATA_EVENT_H
