@@ -2,28 +2,25 @@
 #define JEOPARDY_GAME_CPP_H
 
 #include <list>
+#include <memory>
 
-#include "player.hpp"
 #include "category.hpp"
+#include "game_state.hpp"
 #include "mediator/buzzergroup_manager.hpp"
+#include "player.hpp"
+#include "websocket_server.hpp"
 
 class game
 {
-public:
-    enum class state
-    {
-        NEW,
-        SETUP,
-        SCOREBOARD,
-        ANSWER
-    };
 private:
-    state state;
+    std::unique_ptr<game_state> state;
     std::list<player> players;
     std::vector<category> categories;
     buzzergroup_manager buzzer;
+    websocket_server server;
 public:
-
+    game(int port);
+    void on_client_connect(websocketpp::connection_hdl);
 };
 
 #endif //JEOPARDY_GAME_CPP_H
