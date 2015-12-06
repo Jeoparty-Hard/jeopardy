@@ -3,6 +3,8 @@
 #include <vector>
 #include <boost/filesystem/fstream.hpp>
 
+#include "base64.hpp"
+
 using namespace std;
 using namespace boost::filesystem;
 using namespace rapidjson;
@@ -22,9 +24,9 @@ answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned 
         vector<char> buffer(size);
         file.read(buffer.data(), size);
         file.close();
+        this->data = base64encode(buffer);
     }
     this->type = type;
-    this->data = data;
 }
 
 string answer::getType() const
