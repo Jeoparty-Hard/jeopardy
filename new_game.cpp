@@ -87,7 +87,7 @@ bool new_game::process_event(const GenericValue<UTF8<>> &event)
             categories = round.get_categories();
             for (auto &category : categories)
             {
-                for (auto &answer : category.get_answers())
+                for (auto &answer : category.get_mutable_answers())
                 {
                     answer.load_data();
                 }

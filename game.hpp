@@ -23,6 +23,8 @@ public:
     game(int port);
     void on_client_connect(websocketpp::connection_hdl);
     void on_client_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &);
+    static void make_scoreboard(rapidjson::GenericValue<rapidjson::UTF8<>> &, const std::vector<category> &categories, rapidjson::GenericValue<rapidjson::UTF8<>>::AllocatorType &allocator);
+    static void list_players(rapidjson::GenericValue<rapidjson::UTF8<>> &, const std::list<player> &players, rapidjson::GenericValue<rapidjson::UTF8<>>::AllocatorType &allocator);
 };
 
 #endif //JEOPARDY_GAME_CPP_H

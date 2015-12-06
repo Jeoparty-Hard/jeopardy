@@ -10,7 +10,7 @@ jeopardy_round::jeopardy_round(const rapidjson::GenericValue<rapidjson::UTF8<>> 
     this->categories.resize(size);
     std::vector<unsigned int> points(pointsData.Capacity());
 
-    for (int i = 0;i < size;i++)
+    for (int i = 0;i < points.size();i++)
     {
         points[i] = pointsData[i].GetInt();
     }

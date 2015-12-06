@@ -18,14 +18,19 @@ answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned 
     this->category_path = category_path;
 }
 
-string answer::getType() const
+string answer::get_type() const
 {
     return type;
 }
 
-string answer::getData() const
+string answer::get_data() const
 {
     return data;
+}
+
+unsigned int answer::get_points() const
+{
+    return points;
 }
 
 void answer::load_data()

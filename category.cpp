@@ -8,6 +8,11 @@ using namespace std;
 using namespace boost::filesystem;
 using namespace rapidjson;
 
+std::string category::get_name() const
+{
+    return name;
+}
+
 category::category(const GenericValue<UTF8<>> &category, path round_path, const std::vector<unsigned int> &points)
 {
     this->name = category["name"].GetString();
@@ -25,12 +30,12 @@ category::category(const GenericValue<UTF8<>> &category, path round_path, const 
     }
 }
 
-std::string category::get_name() const
+const std::vector<answer>& category::get_answers() const
 {
-    return name;
+    return answers;
 }
 
-std::vector<answer>& category::get_answers()
+std::vector<answer>& category::get_mutable_answers()
 {
     return answers;
 }

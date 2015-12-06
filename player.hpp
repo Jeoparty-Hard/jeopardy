@@ -4,6 +4,8 @@
 #include <string>
 #include <chrono>
 
+#include <rapidjson/document.h>
+
 class player
 {
 private:
@@ -15,6 +17,10 @@ private:
     std::chrono::duration<int, std::milli> buzztime;
 public:
     player(std::string name);
+    std::string get_name() const;
+    int get_score() const;
+    bool is_connected() const;
+    rapidjson::GenericValue<rapidjson::UTF8<>> buzzed_value() const;
 };
 
 #endif //JEOPARDY_PLAYER_H

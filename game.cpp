@@ -36,3 +36,51 @@ void game::on_client_event(const GenericValue<UTF8<>> &event)
         server.broadcast(d);
     }
 }
+
+void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vector<category> &categories, GenericValue<UTF8<>>::AllocatorType &allocator)
+{
+    root.SetObject();
+    Value points;
+    points.SetArray();
+    bool first = true;
+    Value categoriesValue;
+    categoriesValue.SetArray();
+    for (auto &category : categories)
+    {
+        Value categoryValue;
+        categoryValue.SetObject();
+        categoryValue.AddMember("name", Value(category.get_name().c_str(), category.get_name().size()), allocator);
+        Value winners;
+        winners.SetArray();
+        for (auto &answer : category.get_answers())
+        {
+            // TODO Append actual winners
+            Value winner;
+            winner.SetNull();
+            winners.PushBack(winner, allocator);
+            if (first)
+                points.PushBack(answer.get_points(), allocator);
+        }
+        first = false;
+        categoryValue.AddMember("winner", winners, allocator);
+        categoriesValue.PushBack(categoryValue, allocator);
+    }
+    root.AddMember("points", points, allocator);
+    root.AddMember("categories", categoriesValue, allocator);
+}
+
+void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<player> &players, GenericValue<UTF8<>>::AllocatorType &allocator)
+{
+    root.SetObject();
+    for (auto &player : players)
+    {
+        Value playerValue;
+        playerValue.SetObject();
+        playerValue.AddMember("name", Value(player.get_name().c_str(), player.get_name().size()), allocator);
+        // TODO Color
+        playerValue.AddMember("score", player.get_score(), allocator);
+        playerValue.AddMember("buzzed", player.buzzed_value(), allocator);
+        playerValue.AddMember("connected", player.is_connected(), allocator);
+        root.AddMember("TODO: Actual id", playerValue, allocator);
+    }
+}
