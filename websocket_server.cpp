@@ -43,14 +43,14 @@ websocket_server::websocket_server()
         valijson::adapters::RapidJsonAdapter schemaAdapter(schema_doc);
         parser.populateSchema(schemaAdapter, schema);
         validators.emplace(file.stem().string(), unique_ptr<valijson::Validator>(new valijson::Validator(schema)));
-
     }
 }
 
 void websocket_server::start_listen(int port)
 {
-    // TODO Reuse address
+    this->set_reuse_addr(true);
     this->listen(port);
+    boost::system::error_code ec;
     this->start_accept();
 }
 
