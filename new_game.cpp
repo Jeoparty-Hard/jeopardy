@@ -11,13 +11,14 @@
 
 #include "invalid_json.hpp"
 #include "jeopardy_exception.hpp"
+#include "setup_game.hpp"
 
 using namespace std;
 using namespace boost::filesystem;
 using namespace rapidjson;
 
-new_game::new_game(list<player> *players, vector<category> *categories, websocket_server *server)
-    : game_state(players, categories, server)
+new_game::new_game(list<player> *players, vector<category> *categories, websocket_server *server, unique_ptr<game_state> *next_state)
+    : game_state(players, categories, server, next_state)
 {
     path rounds_dir = "rounds";
     if (!is_directory(rounds_dir))
@@ -68,9 +69,38 @@ new_game::new_game(list<player> *players, vector<category> *categories, websocke
     }
 }
 
-bool new_game::process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event)
+void new_game::initialize()
 {
-    // TODO Implement
+    players.clear();
+    categories.clear();
+}
+
+bool new_game::process_event(const GenericValue<UTF8<>> &event)
+{
+    string event_name = event["event"].GetString();
+    if (event_name == "select_round")
+    {
+        string round_id = event["round"].GetString();
+        try
+        {
+            jeopardy_round &round = rounds.at(round_id);
+            categories = round.get_categories();
+            for (auto &category : categories)
+            {
+                for (auto &answer : category.get_answers())
+                {
+                    answer.load_data();
+                }
+            }
+            next_state.reset(new setup_game(&players, &categories, &server, &next_state));
+        }
+        catch (out_of_range &)
+        {
+            throw jeopardy_exception("round '" + round_id + "' doesn't exist");
+        }
+        return true;
+    }
+    return false;
 }
 
 void new_game::current_state(rapidjson::Document &d)

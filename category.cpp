@@ -30,7 +30,7 @@ std::string category::get_name() const
     return name;
 }
 
-const std::vector<answer>& category::get_answers() const
+std::vector<answer>& category::get_answers()
 {
     return answers;
 }

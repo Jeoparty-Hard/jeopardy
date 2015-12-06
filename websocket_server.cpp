@@ -94,6 +94,7 @@ void websocket_server::on_message(connection_hdl hdl, message_ptr message)
         }
         if (event == "ready") {
             connection_open.raise(hdl);
+            return;
         }
         client_event.raise(d);
     }
