@@ -73,7 +73,9 @@ void websocket_server::on_message(connection_hdl hdl, message_ptr message)
     try
     {
         Document d;
-        d.Parse(message->get_payload().c_str());
+        string payload = message->get_payload();
+        cout << "Received payload: " << payload << endl;
+        d.Parse(payload.c_str());
         if (d.HasParseError())
             throw invalid_json(valijson::ValidationResults::Error({message->get_payload()}, GetParseError_En(d.GetParseError())));
 
