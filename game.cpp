@@ -74,7 +74,8 @@ void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<p
         Value playerValue;
         playerValue.SetObject();
         playerValue.AddMember("name", Value(player.get_name().c_str(), player.get_name().size()), allocator);
-        // TODO Color
+        string color = player.get_color().string();
+        playerValue.AddMember("color", Value(color.c_str(), color.length()), allocator);
         playerValue.AddMember("score", player.get_score(), allocator);
         playerValue.AddMember("buzzed", player.buzzed_value(), allocator);
         playerValue.AddMember("connected", player.is_connected(), allocator);

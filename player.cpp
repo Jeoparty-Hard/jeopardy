@@ -3,7 +3,8 @@
 using namespace std;
 using namespace rapidjson;
 
-player::player(string id, string name)
+player::player(string id, string name, color c)
+    : c(c)
 {
     this->id = id;
     this->name = name;
@@ -20,6 +21,11 @@ std::string player::get_id() const
 std::string player::get_name() const
 {
     return name;
+}
+
+color player::get_color() const
+{
+    return c;
 }
 
 int player::get_score() const
