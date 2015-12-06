@@ -4,10 +4,10 @@ using namespace std;
 using namespace rapidjson;
 
 player::player(string id, string name, color c)
-    : c(c)
 {
     this->id = id;
     this->name = name;
+    this->c = c;
     this->score = 0;
     this->active = true; // TODO Validate that this is a good default value
     this->buzzed = false;

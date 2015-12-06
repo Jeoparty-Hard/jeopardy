@@ -26,4 +26,8 @@ add_subdirectory(mediator)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
+if ( CMAKE_COMPILER_IS_GNUCC )
+    set_property( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
+endif ( CMAKE_COMPILER_IS_GNUCC )
+
 target_link_libraries(${PROJECT_NAME} pthread boost_system boost_filesystem boost_regex mediator)

@@ -8,6 +8,7 @@ class color
 private:
     unsigned char vr, vg, vb;
 public:
+    color();
     color(unsigned char r, unsigned char g, unsigned char b);
     color(std::string color);
     unsigned char r() const;

@@ -5,6 +5,12 @@
 
 using namespace std;
 
+color::color()
+    :color(0, 0, 0)
+{
+    // Nothing to do
+}
+
 color::color(unsigned char r, unsigned char g, unsigned char b)
 {
     this->vr = r;
