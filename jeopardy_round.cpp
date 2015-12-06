@@ -1,7 +1,10 @@
 #include "jeopardy_round.hpp"
 
-jeopardy_round::jeopardy_round(const rapidjson::GenericValue<rapidjson::UTF8<>> &round, boost::filesystem::path round_path)
+using namespace std;
+
+jeopardy_round::jeopardy_round(string id, const rapidjson::GenericValue<rapidjson::UTF8<>> &round, boost::filesystem::path round_path)
 {
+    this->id = id;
     this->name = round["name"].GetString();
     auto &categories = round["categories"];
     auto &pointsData = round["points"];
@@ -21,12 +24,17 @@ jeopardy_round::jeopardy_round(const rapidjson::GenericValue<rapidjson::UTF8<>> 
     }
 }
 
-std::string jeopardy_round::get_name() const
+const string & jeopardy_round::get_id() const
+{
+    return id;
+}
+
+const string & jeopardy_round::get_name() const
 {
     return name;
 }
 
-const std::vector<category>&jeopardy_round::get_categories() const
+const vector<category>&jeopardy_round::get_categories() const
 {
     return categories;
 }

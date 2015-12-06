@@ -65,7 +65,7 @@ new_game::new_game(list<player> *players, vector<category> *categories, websocke
             continue;
         }
 
-        rounds.emplace(current_directory.filename().string(), jeopardy_round(d, current_directory));
+        rounds.emplace(current_directory.filename().string(), jeopardy_round(current_directory.filename().string(), d, current_directory));
     }
 }
 
@@ -109,9 +109,11 @@ void new_game::current_state(rapidjson::Document &d)
     d.AddMember("state", "new", d.GetAllocator());
     Value rounds_value;
     rounds_value.SetObject();
-    for (auto &round : rounds)
+    for (auto it = rounds.begin();it != rounds.end();it++)
     {
-        rounds_value.AddMember(Value(round.first.c_str(), round.first.size()), Value(round.second.get_name().c_str(), round.second.get_name().size()), d.GetAllocator());
+        auto &round = rounds.at(it->first);
+        cout << it->first << " " << round.get_id() << endl;
+        rounds_value.AddMember(Value(round.get_id().c_str(), round.get_id().size()), Value(round.get_name().c_str(), round.get_name().size()), d.GetAllocator());
     }
     d.AddMember("rounds", rounds_value, d.GetAllocator());
 }
