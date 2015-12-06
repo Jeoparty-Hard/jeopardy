@@ -2,11 +2,15 @@
 
 #include <boost/filesystem.hpp>
 
+#include <rapidjson/error/en.h>
 #include <valijson/adapters/rapidjson_adapter.hpp>
 #include <valijson/utils/file_utils.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
 #include <valijson/validator.hpp>
+
+#include "invalid_json.hpp"
+#include "jeopardy_exception.hpp"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -17,13 +21,18 @@ new_game::new_game(list<player> *players, vector<category> *categories, websocke
 {
     path rounds_dir = "rounds";
     if (!is_directory(rounds_dir))
-        return; // TODO Throw exception
+        throw jeopardy_exception("'" + rounds_dir.string() + "' is not a directory");
 
     // Initialize json validator
+    path schema_file = path("json-schema") / "files" / "round.json";
+    if (!is_regular_file(schema_file))
+        throw jeopardy_exception("'" + schema_file.string() + "' is not a regular file");
     Document schema_doc;
     string json;
-    valijson::utils::loadFile("json-schema/files/round.json", json); // TODO Check if file exists
-    schema_doc.Parse(json.c_str()); // TODO Check if schema is valid JSON file
+    valijson::utils::loadFile(schema_file.string(), json);
+    schema_doc.Parse(json.c_str());
+    if (schema_doc.HasParseError())
+        throw invalid_json(valijson::ValidationResults::Error({schema_file.string()}, GetParseError_En(schema_doc.GetParseError())));
 
     valijson::Schema schema;
     valijson::SchemaParser parser;
@@ -41,7 +50,9 @@ new_game::new_game(list<player> *players, vector<category> *categories, websocke
 
         Document d;
         valijson::utils::loadFile(json_file.string(), json);
-        d.Parse(json.c_str()); // TODO Check if file is valid json
+        d.Parse(json.c_str());
+        if (schema_doc.HasParseError())
+            continue; // TODO Send warning to client
 
         valijson::Validator validator(schema);
         valijson::adapters::RapidJsonAdapter targetAdapter(d);

@@ -23,6 +23,7 @@ private:
     void on_message(websocketpp::connection_hdl, message_ptr);
 public:
     event<websocketpp::connection_hdl> connection_open;
+    event<const rapidjson::GenericValue<rapidjson::UTF8<>> &> client_event;
     websocket_server();
     void start_listen(int port);
     void shutdown();

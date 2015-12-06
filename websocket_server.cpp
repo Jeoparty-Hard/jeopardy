@@ -5,12 +5,16 @@
 
 #include <boost/filesystem.hpp>
 
+#include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 #include <valijson/adapters/rapidjson_adapter.hpp>
 #include <valijson/utils/file_utils.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
+
+#include "jeopardy_exception.hpp"
+#include "invalid_json.hpp"
 
 using namespace std;
 using namespace std::placeholders;
@@ -26,17 +30,26 @@ websocket_server::websocket_server()
 
     // Initialize json validators
     path schema_dir = path("json-schema") / "events";
-    if (!is_directory(schema_dir))
-        throw 0; // TODO Handle error properly
+    if (!is_directory(schema_dir)) {
+        throw jeopardy_exception("'json-schema/events' is not a directory");
+    }
     for (directory_iterator it(schema_dir), end;it != end;it++)
     {
         path file = *it;
         if (!is_regular_file(file))
-            continue; // TODO Warning?
+        {
+            cerr << "Warning: " << file.string() << " is not a regular file" << endl;
+            continue;
+        }
         Document schema_doc;
         string json;
         valijson::utils::loadFile(file.string(), json);
-        schema_doc.Parse(json.c_str()); // TODO Check if schema is valid JSON file
+        schema_doc.Parse(json.c_str());
+        if (schema_doc.HasParseError())
+        {
+            cerr << "Warning: Error while parsing " + file.string() + ": " + GetParseError_En(schema_doc.GetParseError()) << endl;
+            continue;
+        }
 
         valijson::Schema schema;
         valijson::SchemaParser parser;
@@ -56,43 +69,73 @@ void websocket_server::start_listen(int port)
 
 void websocket_server::on_message(connection_hdl hdl, message_ptr message)
 {
-    Document d;
-    d.Parse(message->get_payload().c_str()); // TODO Check if file is valid json
-    valijson::adapters::RapidJsonAdapter targetAdapter(d);
-    valijson::ValidationResults results;
-    cout << "starting validation" << endl;
-    for (auto &validator : validators)
-    {
-        cout << validator.first << endl;
-    }
-    cout << "EOF" << endl;
-    if (!validators["basic"]->validate(targetAdapter, &results))
-    {
-        // TODO Proper error reportingerror
-        cout << "failed to validate basic" << endl;
-        return;
-    }
-    cout << "getting event string" << endl;
-    string event = d["event"].GetString();
-    cout << "event: " << event << endl;
     try
     {
-        if (!validators.at(event))
+        Document d;
+        d.Parse(message->get_payload().c_str());
+        if (d.HasParseError())
+            throw invalid_json(valijson::ValidationResults::Error({message->get_payload()}, GetParseError_En(d.GetParseError())));
+
+        valijson::adapters::RapidJsonAdapter targetAdapter(d);
+        valijson::ValidationResults results;
+
+        if (!validators["basic"]->validate(targetAdapter, &results))
+            throw invalid_json(results);
+
+        string event = d["event"].GetString();
+        try
         {
-            // TODO Proper error reporting
-            cout << "failed to validate " << event << endl;
-            return;
+            if (!validators.at(event)->validate(targetAdapter, &results))
+                throw invalid_json(valijson::ValidationResults::Error({message->get_payload()}, GetParseError_En(d.GetParseError())));
         }
+        catch (out_of_range &)
+        {
+            throw invalid_json(valijson::ValidationResults::Error({message->get_payload()}, "Unknown event '" + event + "'"));
+        }
+        if (event == "ready") {
+            connection_open.raise(hdl);
+        }
+        client_event.raise(d);
     }
-    catch (out_of_range &)
+    catch (invalid_json &e)
     {
-        // TODO Proper error reporting
-        cout << "schema not found " << event << endl;
-        return;
+        Document d;
+        d.SetObject();
+        d.AddMember("error", "invalid_json", d.GetAllocator());
+        Value errors;
+        errors.SetArray();
+        for (auto &error : e.get_errors())
+        {
+            Value errValue;
+            errValue.SetObject();
+            errValue.AddMember("description", Value(error.description.c_str(), error.description.size()), d.GetAllocator());
+            Value contextValue;
+            contextValue.SetArray();
+            for (auto &context : error.context)
+            {
+                contextValue.PushBack(Value(context.c_str(), context.size()), d.GetAllocator());
+            }
+            errValue.AddMember("context", contextValue, d.GetAllocator());
+            errors.PushBack(errValue, d.GetAllocator());
+        }
+        d.AddMember("errors", errors, d.GetAllocator());
+        this->broadcast(d);
     }
-    cout << "Validated" << endl;
-    if (event == "ready") {
-        connection_open.raise(hdl);
+    catch (jeopardy_exception &e)
+    {
+        Document d;
+        d.SetObject();
+        d.AddMember("error", "jeopardy_exception", d.GetAllocator());
+        d.AddMember("message", Value(e.what(), string(e.what()).size()), d.GetAllocator());
+        this->broadcast(d);
+    }
+    catch (std::exception &e)
+    {
+        Document d;
+        d.SetObject();
+        d.AddMember("error", "exception", d.GetAllocator());
+        d.AddMember("message", Value(e.what(), string(e.what()).size()), d.GetAllocator());
+        this->broadcast(d);
     }
 }
 
