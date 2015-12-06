@@ -54,10 +54,7 @@ void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vec
         winners.SetArray();
         for (auto &answer : category.get_answers())
         {
-            // TODO Append actual winners
-            Value winner;
-            winner.SetNull();
-            winners.PushBack(winner, allocator);
+            winners.PushBack(answer.winner_value(), allocator);
             if (first)
                 points.PushBack(answer.get_points(), allocator);
         }
@@ -81,6 +78,6 @@ void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<p
         playerValue.AddMember("score", player.get_score(), allocator);
         playerValue.AddMember("buzzed", player.buzzed_value(), allocator);
         playerValue.AddMember("connected", player.is_connected(), allocator);
-        root.AddMember("TODO: Actual id", playerValue, allocator);
+        root.AddMember(Value(player.get_id().c_str(), player.get_id().size()), playerValue, allocator);
     }
 }

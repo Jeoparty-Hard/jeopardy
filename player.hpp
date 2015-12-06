@@ -9,6 +9,7 @@
 class player
 {
 private:
+    std::string id;
     std::string name;
     int score;
     bool active;
@@ -16,7 +17,8 @@ private:
     bool buzzed;
     std::chrono::duration<int, std::milli> buzztime;
 public:
-    player(std::string name);
+    player(std::string id, std::string name);
+    std::string get_id() const;
     std::string get_name() const;
     int get_score() const;
     bool is_connected() const;

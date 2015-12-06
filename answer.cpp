@@ -16,6 +16,8 @@ answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned 
     this->points = points;
     this->data_loaded = false;
     this->category_path = category_path;
+    this->has_winner = false;
+    this->winner = nullptr;
 }
 
 string answer::get_type() const
@@ -31,6 +33,15 @@ string answer::get_data() const
 unsigned int answer::get_points() const
 {
     return points;
+}
+
+rapidjson::GenericValue<rapidjson::UTF8<>> answer::winner_value() const
+{
+    if (!has_winner)
+        return Value();
+    if (winner == nullptr)
+        return Value(false);
+    return Value(winner->get_name().c_str(), winner->get_name().size());
 }
 
 void answer::load_data()

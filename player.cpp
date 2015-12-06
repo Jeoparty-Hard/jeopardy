@@ -3,12 +3,18 @@
 using namespace std;
 using namespace rapidjson;
 
-player::player(string name)
+player::player(string id, string name)
 {
+    this->id = id;
     this->name = name;
     this->score = 0;
     this->active = true; // TODO Validate that this is a good default value
     this->buzzed = false;
+}
+
+std::string player::get_id() const
+{
+    return id;
 }
 
 std::string player::get_name() const
