@@ -26,6 +26,7 @@ websocket_server::websocket_server()
 {
     this->init_asio();
     this->set_open_handler(bind(&websocket_server::on_connection_open, this, placeholders::_1));
+    this->set_close_handler(bind(&websocket_server::on_connection_close, this, placeholders::_1));
     this->set_message_handler(bind(&websocket_server::on_message, this, placeholders::_1, placeholders::_2));
 
     // Initialize json validators
