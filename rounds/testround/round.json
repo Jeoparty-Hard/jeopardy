@@ -1,0 +1,43 @@
+{
+  "name": "Rundenname",
+  "double_jeopardy_count": 2,
+  "points": [100, 200, 300, 400, 500],
+  "categories": [
+    {
+      "name": "Test Group 1",
+      "path": "cat_group_1",
+      "answers": [
+        {
+          "type": "text",
+          "data": "Hello World",
+          "description": "Hello World is a common code to learn a new language.",
+          "answer": "text describing the solution to the game master"
+        },
+        {
+          "type": "text",
+          "data": "Hello World2",
+          "description": "Hello World is a common code to learn a new language.",
+          "answer": "text describing the solution to the game master"
+        },
+        {
+          "type": "text",
+          "data": "Hello World3",
+          "description": "Hello World is a common code to learn a new language.",
+          "answer": "text describing the solution to the game master"
+        },
+        {
+          "type": "text",
+          "data": "Hello World4",
+          "description": "Hello World is a common code to learn a new language.",
+          "answer": "text describing the solution to the game master"
+        },
+        {
+          "type": "text",
+          "data": "Hello World5",
+          "description": "Hello World is a common code to learn a new language.",
+          "answer": "text describing the solution to the game master"
+        }
+      ]
+    }
+  ]
+}
