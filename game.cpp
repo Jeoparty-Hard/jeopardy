@@ -83,7 +83,12 @@ void game::on_buzzergroup_connected(std::string device, const std::set<unsigned 
 
 void game::on_buzzergroup_connect_failed(std::string device, std::string error_message)
 {
-    // TODO Implmenet
+    Document d;
+    d.SetObject();
+    d.AddMember("error", "connect_failed", d.GetAllocator());
+    d.AddMember("device", Value(device.c_str(), device.size()), d.GetAllocator());
+    d.AddMember("message", Value(error_message.c_str(), error_message.size()), d.GetAllocator());
+    server.broadcast(d);
 }
 
 void game::on_buzzergroup_disconnected(std::string device, disconnect_reason reason)
