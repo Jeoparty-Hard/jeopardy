@@ -16,6 +16,7 @@ public:
     virtual ~new_game() = default;
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);
+    virtual void on_buzz(const buzzer &);
     virtual void current_state(rapidjson::Document &);
 };
 

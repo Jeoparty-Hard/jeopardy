@@ -11,11 +11,13 @@ private:
     std::string current_playername;
     color playercolor;
     bool current_player_connected;
+    buzzer current_player_buzzer;
 public:
     setup_game(std::list<player> *players, std::vector<category> *categories, websocket_server *server, std::unique_ptr<game_state> *next_state);
     virtual ~setup_game() = default;
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);
+    virtual void on_buzz(const buzzer &);
     virtual void current_state(rapidjson::Document &);
 };
 

@@ -7,6 +7,7 @@
 #include <rapidjson/document.h>
 
 #include "color.hpp"
+#include "mediator/buzzer.hpp"
 
 class player
 {
@@ -17,10 +18,11 @@ private:
     int score;
     bool active;
     bool connected;
+    buzzer buzzer;
     bool buzzed;
     std::chrono::duration<int, std::milli> buzztime;
 public:
-    player(std::string id, std::string name, color);
+    player(std::string id, std::string name, color, const ::buzzer &);
     const std::string & get_id() const;
     const std::string & get_name() const;
     color get_color() const;

@@ -3,12 +3,14 @@
 using namespace std;
 using namespace rapidjson;
 
-player::player(string id, string name, color c)
+player::player(string id, string name, color c, const ::buzzer &buzzer)
+    : buzzer(buzzer)
 {
     this->id = id;
     this->name = name;
     this->c = c;
     this->score = 0;
+    this->connected = true;
     this->active = true; // TODO Validate that this is a good default value
     this->buzzed = false;
 }

@@ -103,6 +103,11 @@ bool new_game::process_event(const GenericValue<UTF8<>> &event)
     return false;
 }
 
+void new_game::on_buzz(const buzzer &buzzer)
+{
+    // Nothing to do
+}
+
 void new_game::current_state(rapidjson::Document &d)
 {
     d.SetObject();

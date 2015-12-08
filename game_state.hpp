@@ -10,6 +10,7 @@
 #include "player.hpp"
 #include "category.hpp"
 #include "websocket_server.hpp"
+#include "mediator/buzzer.hpp"
 
 class game_state
 {
@@ -23,6 +24,7 @@ public:
     virtual ~game_state() = default;
     virtual void initialize() = 0;
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event) = 0;
+    virtual void on_buzz(const buzzer &) = 0;
     virtual void current_state(rapidjson::Document &) = 0;
 };
 

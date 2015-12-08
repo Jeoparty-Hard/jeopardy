@@ -1,6 +1,7 @@
 #include "setup_game.hpp"
 
 #include "game.hpp"
+#include "jeopardy_exception.hpp"
 
 using namespace std;
 using namespace rapidjson;
@@ -26,7 +27,7 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
             return false;
         edit_player_active = true;
         current_playername = "";
-        current_player_connected = true;
+        current_player_connected = false;
         playercolor = color(event["color"].GetString());
         Document d;
         current_state(d);
@@ -45,9 +46,11 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
     {
         if (!edit_player_active)
             return false;
-        // TODO Check if player is attached before confirming
+        if (!current_player_connected)
+            throw jeopardy_exception("The player doesn't have a buzzer assigned");
+        // TODO Check if buzzer is already registered for another player
         edit_player_active = false;
-        players.emplace_back(to_string(next_player_id++), current_playername, color(playercolor));
+        players.emplace_back(to_string(next_player_id++), current_playername, color(playercolor), current_player_buzzer);
         Document d;
         current_state(d);
         server.broadcast(d);
@@ -57,6 +60,19 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
         return false;
     }
     return true;
+}
+
+void setup_game::on_buzz(const buzzer &buzzer)
+{
+    if (!edit_player_active)
+        return;
+    if (current_player_connected)
+        return;
+    current_player_connected = true;
+    current_player_buzzer = buzzer;
+    Document d;
+    current_state(d);
+    server.broadcast(d);
 }
 
 void setup_game::current_state(rapidjson::Document &d)
