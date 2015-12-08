@@ -2,6 +2,7 @@
 
 #include "game.hpp"
 #include "jeopardy_exception.hpp"
+#include "scoreboard.hpp"
 
 using namespace std;
 using namespace rapidjson;
@@ -53,6 +54,14 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
         Document d;
         current_state(d);
         server.broadcast(d);
+    }
+    else if (event_type == "start")
+    {
+        if (edit_player_active)
+            return false;
+        if (players.size() < 1)
+            throw jeopardy_exception("At least one player is required to start the game");
+        next_state.reset(new scoreboard(&players, &categories, &server, &next_state));
     }
     else
     {

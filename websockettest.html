@@ -32,6 +32,9 @@ sock.onmessage = function (event) {
 	else if (i == 9) {
 		sock.send(JSON.stringify({event:"confirm_player"}));
 	}
+	else if (i == 10) {
+		sock.send(JSON.stringify({event:"start"}));
+	}
 	i++;
 };
 sock.onopen = function (event) {
