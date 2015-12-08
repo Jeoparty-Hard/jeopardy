@@ -48,7 +48,6 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
             return false;
         if (!current_player_connected)
             throw jeopardy_exception("The player doesn't have a buzzer assigned");
-        // TODO Check if buzzer is already registered for another player
         edit_player_active = false;
         players.emplace_back(to_string(next_player_id++), current_playername, color(playercolor), current_player_buzzer);
         Document d;
@@ -67,6 +66,8 @@ void setup_game::on_buzz(const buzzer &buzzer)
     if (!edit_player_active)
         return;
     if (current_player_connected)
+        return;
+    if (find_if(players.begin(), players.end(), [buzzer](const player &player){return player.is_connected() && buzzer == player.get_buzzer();}) != players.end())
         return;
     current_player_connected = true;
     current_player_buzzer = buzzer;

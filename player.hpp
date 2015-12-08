@@ -16,7 +16,6 @@ private:
     std::string name;
     color c;
     int score;
-    bool active;
     bool connected;
     buzzer buzzer;
     bool buzzed;
@@ -28,6 +27,7 @@ public:
     color get_color() const;
     int get_score() const;
     bool is_connected() const;
+    const ::buzzer & get_buzzer() const;
     rapidjson::GenericValue<rapidjson::UTF8<>> buzzed_value() const;
 };
 

@@ -11,7 +11,6 @@ player::player(string id, string name, color c, const ::buzzer &buzzer)
     this->c = c;
     this->score = 0;
     this->connected = true;
-    this->active = true; // TODO Validate that this is a good default value
     this->buzzed = false;
 }
 
@@ -38,6 +37,11 @@ int player::get_score() const
 bool player::is_connected() const
 {
     return connected;
+}
+
+const ::buzzer& player::get_buzzer() const
+{
+    return buzzer;
 }
 
 GenericValue<UTF8<>> player::buzzed_value() const
