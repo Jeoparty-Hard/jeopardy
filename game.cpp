@@ -10,6 +10,11 @@ using namespace rapidjson;
 
 game::game(int port)
 {
+    buzzer.buzzer_hit.connect(bind(&game::on_buzzer_hit, this, _1, _2));
+    buzzer.buzzer_disconnected.connect(bind(&game::on_buzzer_disconnected, this, _1, _2));
+    buzzer.buzzergroup_connected.connect(bind(&game::on_buzzergroup_connected, this, _1, _2));
+    buzzer.buzzergroup_connect_failed.connect(bind(&game::on_buzzergroup_connect_failed, this, _1, _2));
+    buzzer.buzzergroup_disconnected.connect(bind(&game::on_buzzergroup_disconnected, this, _1, _2));
     state.reset(new new_game(&players, &categories, &server, &next_state));
     server.connection_open.connect(bind(&game::on_client_connect, this, _1));
     server.client_event.connect(bind(&game::on_client_event, this, _1));
