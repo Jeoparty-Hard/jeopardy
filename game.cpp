@@ -26,15 +26,60 @@ void game::on_client_connect(websocketpp::connection_hdl hdl)
 
 void game::on_client_event(const GenericValue<UTF8<>> &event)
 {
+    if (string(event["event"].GetString()) == "connect_buzzergroup")
+    {
+        string device_type = event["type"].GetString();
+        enum device_type type;
+        if (device_type == "serial")
+        {
+            type = device_type::SERIAL;
+        }
+        else if (device_type == "keyboard")
+        {
+            type = device_type::KEYBOARD;
+        }
+        else
+        {
+            throw jeopardy_exception("Unexpected buzzergroup type '" + device_type + "'");
+        }
+        buzzer.connect(event["device"].GetString(), type);
+        return;
+    }
     if (!state->process_event(event))
         throw jeopardy_exception("Event '" + string(event["event"].GetString()) + "' not allowed in this state");
-    if (next_state) {
+    if (next_state)
+    {
         state.reset(next_state.release());
         state->initialize();
         Document d;
         state->current_state(d);
         server.broadcast(d);
     }
+}
+
+void game::on_buzzer_hit(std::string device, unsigned char buzzer_id)
+{
+    // TODO Implement
+}
+
+void game::on_buzzer_disconnected(std::string device, unsigned char buzzer_id)
+{
+    // TODO Implement
+}
+
+void game::on_buzzergroup_connected(std::string device, const std::set<unsigned char> &buzzer_ids)
+{
+    // TODO Implement
+}
+
+void game::on_buzzergroup_connect_failed(std::string device, std::string error_message)
+{
+    // TODO Implmenet
+}
+
+void game::on_buzzergroup_disconnected(std::string device, disconnect_reason reason)
+{
+    // TODO Implement
 }
 
 void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vector<category> &categories, GenericValue<UTF8<>>::AllocatorType &allocator)

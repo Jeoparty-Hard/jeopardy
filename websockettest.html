@@ -9,24 +9,27 @@ var sock = new WebSocket("ws://localhost:4242");
 sock.onmessage = function (event) {
 	console.log(event.data);
 	if (i == 0) {
-		sock.send(JSON.stringify({event:"select_round",round:"testround"}));
+		sock.send(JSON.stringify({event:"select_round", round:"testround"}));
 	}
 	else if (i == 1) {
-		sock.send(JSON.stringify({event:"add_player", color:"#FF12aa"}));
+		sock.send(JSON.stringify({event:"connect_buzzergroup", type: "keyboard", device: "/dev/input/by-id/usb-046d_Gaming_Keyboard_G110-event-kbd"}));
 	}
 	else if (i == 2) {
-		sock.send(JSON.stringify({event:"update_player_name", name:"Manuel"}));
+		sock.send(JSON.stringify({event:"add_player", color:"#FF12aa"}));
 	}
 	else if (i == 3) {
-		sock.send(JSON.stringify({event:"confirm_player"}));
+		sock.send(JSON.stringify({event:"update_player_name", name:"Manuel"}));
 	}
 	else if (i == 4) {
-		sock.send(JSON.stringify({event:"add_player", color:"#bb12aa"}));
+		sock.send(JSON.stringify({event:"confirm_player"}));
 	}
 	else if (i == 5) {
-		sock.send(JSON.stringify({event:"update_player_name", name:"Manuel2"}));
+		sock.send(JSON.stringify({event:"add_player", color:"#bb12aa"}));
 	}
 	else if (i == 6) {
+		sock.send(JSON.stringify({event:"update_player_name", name:"Fitsch"}));
+	}
+	else if (i == 7) {
 		sock.send(JSON.stringify({event:"confirm_player"}));
 	}
 	i++;
