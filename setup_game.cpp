@@ -26,6 +26,7 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
             return false;
         edit_player_active = true;
         current_playername = "";
+        current_player_connected = true;
         playercolor = color(event["color"].GetString());
         Document d;
         current_state(d);
@@ -68,12 +69,13 @@ void setup_game::current_state(rapidjson::Document &d)
     Value playersValue;
     game::list_players(playersValue, players, d.GetAllocator());
     d.AddMember("players", playersValue, d.GetAllocator());
-    if (edit_player_active) {
-        Value action;
-        action.SetObject();
-        action.AddMember("type", "edit_player", d.GetAllocator());
-        action.AddMember("name", Value(current_playername.c_str(), current_playername.size()), d.GetAllocator());
-        action.AddMember("color", Value(playercolor.string().c_str(), playercolor.string().size()), d.GetAllocator());
-        d.AddMember("action", action, d.GetAllocator());
+    Value new_player;
+    if (edit_player_active)
+    {
+        new_player.SetObject();
+        new_player.AddMember("name", Value(current_playername.c_str(), current_playername.size()), d.GetAllocator());
+        new_player.AddMember("color", Value(playercolor.string().c_str(), playercolor.string().size()), d.GetAllocator());
+        new_player.AddMember("connected", current_player_connected, d.GetAllocator());
     }
+    d.AddMember("new_player", new_player, d.GetAllocator());
 }
