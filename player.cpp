@@ -13,12 +13,12 @@ player::player(string id, string name, color c)
     this->buzzed = false;
 }
 
-std::string player::get_id() const
+const string & player::get_id() const
 {
     return id;
 }
 
-std::string player::get_name() const
+const string & player::get_name() const
 {
     return name;
 }

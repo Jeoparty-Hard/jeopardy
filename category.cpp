@@ -8,7 +8,7 @@ using namespace std;
 using namespace boost::filesystem;
 using namespace rapidjson;
 
-std::string category::get_name() const
+const string & category::get_name() const
 {
     return name;
 }

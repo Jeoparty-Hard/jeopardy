@@ -21,8 +21,8 @@ private:
 public:
     answer() = default;
     answer(const rapidjson::GenericValue<rapidjson::UTF8<>> &, boost::filesystem::path category_path, unsigned int points);
-    std::string get_type() const;
-    std::string get_data() const;
+    const std::string & get_type() const;
+    const std::string & get_data() const;
     unsigned int get_points() const;
     rapidjson::GenericValue<rapidjson::UTF8<>> winner_value() const;
     void load_data();

@@ -17,7 +17,7 @@ private:
 public:
     category() = default;
     category(const rapidjson::GenericValue<rapidjson::UTF8<>> &, boost::filesystem::path round_path, const std::vector<unsigned int> &points);
-    std::string get_name() const;
+    const std::string & get_name() const;
     const std::vector<answer> & get_answers() const;
     std::vector<answer> & get_mutable_answers();
 };

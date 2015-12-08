@@ -20,12 +20,12 @@ answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned 
     this->winner = nullptr;
 }
 
-string answer::get_type() const
+const string & answer::get_type() const
 {
     return type;
 }
 
-string answer::get_data() const
+const string & answer::get_data() const
 {
     return data;
 }

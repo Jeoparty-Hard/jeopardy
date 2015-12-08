@@ -21,8 +21,8 @@ private:
     std::chrono::duration<int, std::milli> buzztime;
 public:
     player(std::string id, std::string name, color);
-    std::string get_id() const;
-    std::string get_name() const;
+    const std::string & get_id() const;
+    const std::string & get_name() const;
     color get_color() const;
     int get_score() const;
     bool is_connected() const;
