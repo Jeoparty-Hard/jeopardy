@@ -2,28 +2,7 @@
 
 using namespace std;
 
-static const string base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-typedef struct
-{
-    char byte1;
-    char byte2;
-    char byte3;
-} origdata;
-
-typedef struct
-{
-    unsigned char char1 : 6;
-    unsigned char char2 : 6;
-    unsigned char char3 : 6;
-    unsigned char char4 : 6;
-} b64data;
-
-typedef union
-{
-    origdata data;
-    b64data base64;
-} b64union;
+static const char* base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 string base64encode(const vector<char> &data)
 {
