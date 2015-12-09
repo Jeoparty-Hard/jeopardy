@@ -17,7 +17,7 @@ private:
     color c;
     int score;
     bool connected;
-    buzzer buzzer;
+    buzzer mybuzzer;
     bool buzzed;
     std::chrono::duration<int, std::milli> buzztime;
 public:

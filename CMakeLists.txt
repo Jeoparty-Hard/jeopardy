@@ -7,6 +7,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${jeopardy_SOURCE_DIR}/build)
 
 set(SOURCE_FILES
         answer.cpp
+        answer_screen.cpp
         base64.cpp
         category.cpp
         color.cpp

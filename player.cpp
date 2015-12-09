@@ -4,7 +4,7 @@ using namespace std;
 using namespace rapidjson;
 
 player::player(string id, string name, color c, const ::buzzer &buzzer)
-    : buzzer(buzzer)
+    : mybuzzer(buzzer)
 {
     this->id = id;
     this->name = name;
@@ -41,7 +41,7 @@ bool player::is_connected() const
 
 const ::buzzer& player::get_buzzer() const
 {
-    return buzzer;
+    return mybuzzer;
 }
 
 GenericValue<UTF8<>> player::buzzed_value() const
