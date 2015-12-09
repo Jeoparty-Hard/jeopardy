@@ -36,7 +36,7 @@ string base64encode(const vector<char> &data)
     unsigned char char3;
     int fillbytes = 0;
     string result = "";
-    for (int i = 0;i < data.size();i += 3)
+    for (size_t i = 0;i < data.size();i += 3)
     {
         byte0 = data[i];
         if (i + 1 < data.size())

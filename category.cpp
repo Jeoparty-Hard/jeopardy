@@ -24,7 +24,7 @@ category::category(const GenericValue<UTF8<>> &category, path round_path, const 
     }
     this->answers.resize(size);
     path category_path = round_path / category["path"].GetString();
-    for (int i = 0;i < size;i++)
+    for (SizeType i = 0;i < size;i++)
     {
         this->answers[i] = answer(answers[i], category_path, points[i]);
     }

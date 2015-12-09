@@ -13,12 +13,12 @@ jeopardy_round::jeopardy_round(string id, const rapidjson::GenericValue<rapidjso
     this->categories.resize(size);
     std::vector<unsigned int> points(pointsData.Capacity());
 
-    for (int i = 0;i < points.size();i++)
+    for (size_t i = 0;i < points.size();i++)
     {
         points[i] = pointsData[i].GetInt();
     }
 
-    for (int i = 0;i < size;i++)
+    for (size_t i = 0;i < size;i++)
     {
         this->categories[i] = category(categories[i], round_path, points);
     }

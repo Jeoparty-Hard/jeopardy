@@ -5,7 +5,7 @@ using namespace std;
 invalid_json::invalid_json(valijson::ValidationResults results)
     : errors(results.numErrors())
 {
-    for (int i = 0;i < results.numErrors();i++)
+    for (size_t i = 0;i < results.numErrors();i++)
     {
         results.popError(errors[i]);
     }
