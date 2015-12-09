@@ -30,6 +30,17 @@ void player::add_score(int score)
     this->score += score;
 }
 
+void player::set_buzzer(const buzzer &mybuzzer)
+{
+    this->mybuzzer = mybuzzer;
+    this->connected = true;
+}
+
+void player::disconnect()
+{
+    this->connected = false;
+}
+
 const string & player::get_id() const
 {
     return id;

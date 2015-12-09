@@ -75,9 +75,16 @@ void game::on_buzzer_hit(const buzzer &buzzer)
     state->on_buzz(buzzer);
 }
 
-void game::on_buzzer_disconnected(const buzzer &buzzer)
+void game::on_buzzer_disconnected(const buzzer &disconnected_buzzer)
 {
-    // TODO Implement
+    auto it = find_if(players.begin(), players.end(), [disconnected_buzzer](const player &player){return player.is_connected() && player.get_buzzer() == disconnected_buzzer;});
+    if (it != players.end())
+        return;
+    auto &player = *it;
+    player.disconnect();
+    Document d;
+    state->current_state(d);
+    server.broadcast(d);
 }
 
 void game::on_buzzergroup_connected(std::string device, const std::set<unsigned char> &buzzer_ids)
@@ -101,7 +108,15 @@ void game::on_buzzergroup_connect_failed(std::string device, std::string error_m
 
 void game::on_buzzergroup_disconnected(std::string device, disconnect_reason reason)
 {
-    // TODO Implement
+    for (auto &player : players)
+    {
+        if (!player.is_connected() || player.get_buzzer().device != device)
+            continue;
+        player.disconnect();
+    }
+    Document d;
+    state->current_state(d);
+    server.broadcast(d);
 }
 
 void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vector<category> &categories, GenericValue<UTF8<>>::AllocatorType &allocator)
