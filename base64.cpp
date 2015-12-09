@@ -6,9 +6,9 @@ static const char* base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrst
 
 string base64encode(const vector<char> &data)
 {
-    char byte0;
-    char byte1;
-    char byte2;
+    unsigned char byte0;
+    unsigned char byte1;
+    unsigned char byte2;
     unsigned char char0;
     unsigned char char1;
     unsigned char char2;
