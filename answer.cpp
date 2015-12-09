@@ -57,7 +57,7 @@ rapidjson::GenericValue<rapidjson::UTF8<>> answer::winner_value() const
         return Value();
     if (winner == nullptr)
         return Value(false);
-    return Value(winner->get_name().c_str(), winner->get_name().size());
+    return Value(winner->get_id().c_str(), winner->get_id().size());
 }
 
 void answer::load_data()

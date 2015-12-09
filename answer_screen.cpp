@@ -71,6 +71,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
             else if (player.get_score() < next_player->get_score())
                 next_player = &player;
         }
+        selected_answer->set_winner(nullptr);
         next_state.reset(new scoreboard(next_player, &players, &categories, &server, &next_state));
     }
     else
