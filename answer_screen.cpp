@@ -48,6 +48,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         auto player = *buzzorder.begin();
         player->add_score(-selected_answer->get_points());
         selected_answer->add_looser(player);
+        buzzorder.clear();
         send_buzzorder();
     }
     else if (event_type == "oops")
