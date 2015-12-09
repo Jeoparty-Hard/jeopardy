@@ -10,6 +10,7 @@ using namespace rapidjson;
 
 game::game(int port)
 {
+    this->reconnect_player = nullptr;
     buzzer_manager.buzzer_hit.connect(bind(&game::on_buzzer_hit, this, _1));
     buzzer_manager.buzzer_disconnected.connect(bind(&game::on_buzzer_disconnected, this, _1));
     buzzer_manager.buzzergroup_connected.connect(bind(&game::on_buzzergroup_connected, this, _1, _2));
@@ -51,6 +52,20 @@ void game::on_client_event(const GenericValue<UTF8<>> &event)
         buzzer_manager.connect(event["device"].GetString(), type);
         return;
     }
+    if (event_type == "reconnect")
+    {
+        string player_id = event["player"].GetString();
+        auto it = find_if(players.begin(), players.end(), [player_id](const player &player){return player.get_id() == player_id;});
+        if (it == players.end())
+            return;
+        auto &player = *it;
+        if (player.is_connected())
+            throw jeopardy_exception("Player '" + player.get_name() + "' is already connected");
+        if (reconnect_player != nullptr)
+            throw jeopardy_exception("Player '" + reconnect_player->get_name() + "' is currently connecting");
+        reconnect_player = &player;
+        return;
+    }
     if (event_type == "refresh")
     {
         Document d;
@@ -70,9 +85,22 @@ void game::on_client_event(const GenericValue<UTF8<>> &event)
     }
 }
 
-void game::on_buzzer_hit(const buzzer &buzzer)
+void game::on_buzzer_hit(const buzzer &buzzer_hit)
 {
-    state->on_buzz(buzzer);
+    if (reconnect_player != nullptr)
+    {
+        auto it = find_if(players.begin(), players.end(), [buzzer_hit](const player &player){return player.is_connected() && player.get_buzzer() == buzzer_hit;});
+        if (it == players.end())
+        {
+            reconnect_player->set_buzzer(buzzer_hit);
+            reconnect_player = nullptr;
+            Document d;
+            state->current_state(d);
+            server.broadcast(d);
+            return;
+        }
+    }
+    state->on_buzz(buzzer_hit);
 }
 
 void game::on_buzzer_disconnected(const buzzer &disconnected_buzzer)

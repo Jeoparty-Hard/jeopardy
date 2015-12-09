@@ -85,7 +85,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
 void answer_screen::on_buzz(const buzzer &hit_buzzer)
 {
     duration<int, milli> time = duration_cast<milliseconds>(high_resolution_clock::now() - start);
-    auto &player = *find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.get_buzzer() == hit_buzzer;});
+    auto &player = *find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.is_connected() && player.get_buzzer() == hit_buzzer;});
     if (player.has_buzzed())
         return;
     if (find(selected_answer->get_loosers().begin(), selected_answer->get_loosers().end(), &player) != selected_answer->get_loosers().end())

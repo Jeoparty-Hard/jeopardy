@@ -19,6 +19,7 @@ private:
     std::vector<category> categories;
     buzzergroup_manager buzzer_manager;
     websocket_server server;
+    player *reconnect_player;
     void on_client_connect(websocketpp::connection_hdl);
     void on_client_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &);
     void on_buzzergroup_connected(std::string device, const std::set<unsigned char> &buzzer_ids);
