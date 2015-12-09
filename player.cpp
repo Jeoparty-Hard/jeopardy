@@ -14,6 +14,17 @@ player::player(string id, string name, color c, const buzzer &buzzer)
     this->buzzed = false;
 }
 
+void player::set_buzztime(const std::chrono::duration<int, std::milli> &buzztime)
+{
+    this->buzzed = true;
+    this->buzztime = buzztime;
+}
+
+void player::reset_buzztime()
+{
+    this->buzzed = false;
+}
+
 const string & player::get_id() const
 {
     return id;

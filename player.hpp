@@ -22,6 +22,8 @@ private:
     std::chrono::duration<int, std::milli> buzztime;
 public:
     player(std::string id, std::string name, color, const buzzer &);
+    void set_buzztime(const std::chrono::duration<int, std::milli> &);
+    void reset_buzztime();
     const std::string & get_id() const;
     const std::string & get_name() const;
     color get_color() const;

@@ -8,7 +8,7 @@
 class answer_screen : public game_state
 {
 private:
-    std::list<player> buzzorder;
+    std::list<player*> buzzorder;
     const answer *selected_answer;
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
 public:

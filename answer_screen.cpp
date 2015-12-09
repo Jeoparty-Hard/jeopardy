@@ -1,5 +1,7 @@
 #include "answer_screen.hpp"
 
+#include <algorithm>
+
 #include "game.hpp"
 
 using namespace std;
@@ -14,6 +16,11 @@ answer_screen::answer_screen(const answer *selected_answer, list<player> *player
 
 void answer_screen::initialize()
 {
+    for (auto &player : players)
+    {
+        player.reset_buzztime();
+    }
+    buzzorder.clear();
     start = high_resolution_clock::now();
 }
 
@@ -22,9 +29,17 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
     return false;
 }
 
-void answer_screen::on_buzz(const buzzer &)
+void answer_screen::on_buzz(const buzzer &hit_buzzer)
 {
-    // TODO Implement
+    duration<int, milli> time = duration_cast<milliseconds>(high_resolution_clock::now() - start);
+    auto &player = *find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.get_buzzer() == hit_buzzer;});
+    if (player.has_buzzed())
+        return;
+    player.set_buzztime(time);
+    buzzorder.push_back(&player);
+    Document d;
+    current_state(d);
+    server.broadcast(d);
 }
 
 void answer_screen::current_state(Document &d)
@@ -44,12 +59,12 @@ void answer_screen::current_state(Document &d)
     buzzorderValue.SetObject();
     bool first_buzz = true;
     duration<int, milli> first_time;
-    for (auto &player : buzzorder)
+    for (auto player : buzzorder)
     {
-        if (!player.has_buzzed())
+        if (!player->has_buzzed())
             continue;
         duration<int, milli> time;
-        time = player.get_buzztime();
+        time = player->get_buzztime();
         if (first_buzz)
         {
             first_buzz = false;
@@ -59,7 +74,7 @@ void answer_screen::current_state(Document &d)
         {
             time -= first_time;
         }
-        buzzorderValue.AddMember(Value(player.get_id().c_str(), player.get_id().size()), Value(time.count()), d.GetAllocator());
+        buzzorderValue.AddMember(Value(player->get_id().c_str(), player->get_id().size()), Value(time.count()), d.GetAllocator());
     }
     d.AddMember("buzzorder", buzzorderValue, d.GetAllocator());
 }
