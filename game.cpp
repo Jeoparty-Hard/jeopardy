@@ -139,5 +139,4 @@ void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<p
         playerValue.AddMember("connected", player.is_connected(), allocator);
         root.AddMember(Value(player.get_id().c_str(), player.get_id().size()), playerValue, allocator);
     }
-    cout << endl;
 }

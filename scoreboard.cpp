@@ -34,6 +34,7 @@ bool scoreboard::process_event(const GenericValue<UTF8<>> &event)
         int answer_id = event["answer"].GetInt();
         try
         {
+            next_state.reset(new answer_screen(&categories.at(category_id).get_answers().at(answer_id), &players, &categories, &server, &next_state));
         }
         catch (out_of_range &)
         {

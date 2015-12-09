@@ -35,6 +35,9 @@ sock.onmessage = function (event) {
 	else if (i == 10) {
 		sock.send(JSON.stringify({event:"start"}));
 	}
+	else if (i == 11) {
+		sock.send(JSON.stringify({event:"select_answer", category:0, answer:0}));
+	}
 	i++;
 };
 sock.onopen = function (event) {

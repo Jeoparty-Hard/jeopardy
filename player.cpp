@@ -3,7 +3,7 @@
 using namespace std;
 using namespace rapidjson;
 
-player::player(string id, string name, color c, const ::buzzer &buzzer)
+player::player(string id, string name, color c, const buzzer &buzzer)
     : mybuzzer(buzzer)
 {
     this->id = id;
@@ -39,9 +39,19 @@ bool player::is_connected() const
     return connected;
 }
 
-const ::buzzer& player::get_buzzer() const
+const buzzer& player::get_buzzer() const
 {
     return mybuzzer;
+}
+
+bool player::has_buzzed() const
+{
+    return buzzed;
+}
+
+const std::chrono::duration<int, std::milli>& player::get_buzztime() const
+{
+    return buzztime;
 }
 
 GenericValue<UTF8<>> player::buzzed_value() const

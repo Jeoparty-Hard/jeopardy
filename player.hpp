@@ -21,13 +21,15 @@ private:
     bool buzzed;
     std::chrono::duration<int, std::milli> buzztime;
 public:
-    player(std::string id, std::string name, color, const ::buzzer &);
+    player(std::string id, std::string name, color, const buzzer &);
     const std::string & get_id() const;
     const std::string & get_name() const;
     color get_color() const;
     int get_score() const;
     bool is_connected() const;
-    const ::buzzer & get_buzzer() const;
+    const buzzer & get_buzzer() const;
+    bool has_buzzed() const;
+    const std::chrono::duration<int, std::milli> & get_buzztime() const;
     rapidjson::GenericValue<rapidjson::UTF8<>> buzzed_value() const;
 };
 
