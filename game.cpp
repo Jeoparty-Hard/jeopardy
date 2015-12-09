@@ -31,7 +31,8 @@ void game::on_client_connect(websocketpp::connection_hdl hdl)
 
 void game::on_client_event(const GenericValue<UTF8<>> &event)
 {
-    if (string(event["event"].GetString()) == "connect_buzzergroup")
+    string event_type = event["event"].GetString();
+    if (event_type == "connect_buzzergroup")
     {
         string device_type_string = event["type"].GetString();
         device_type type;
@@ -48,6 +49,13 @@ void game::on_client_event(const GenericValue<UTF8<>> &event)
             throw jeopardy_exception("Unexpected buzzergroup type '" + device_type_string + "'");
         }
         buzzer_manager.connect(event["device"].GetString(), type);
+        return;
+    }
+    if (event_type == "refresh")
+    {
+        Document d;
+        state->current_state(d);
+        server.broadcast(d);
         return;
     }
     if (!state->process_event(event))
