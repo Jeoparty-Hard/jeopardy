@@ -20,6 +20,17 @@ answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned 
     this->winner = nullptr;
 }
 
+void answer::set_winner(player *winner)
+{
+    this->has_winner = true;
+    this->winner = winner;
+}
+
+void answer::add_looser(player *looser)
+{
+    this->loosers.push_back(looser);
+}
+
 const string & answer::get_type() const
 {
     return type;
@@ -33,6 +44,11 @@ const string & answer::get_data() const
 unsigned int answer::get_points() const
 {
     return points;
+}
+
+const std::list<player*> & answer::get_loosers() const
+{
+    return loosers;
 }
 
 rapidjson::GenericValue<rapidjson::UTF8<>> answer::winner_value() const

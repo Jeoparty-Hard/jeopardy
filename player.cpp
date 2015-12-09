@@ -25,6 +25,11 @@ void player::reset_buzztime()
     this->buzzed = false;
 }
 
+void player::add_score(int score)
+{
+    this->score += score;
+}
+
 const string & player::get_id() const
 {
     return id;
