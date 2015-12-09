@@ -33,19 +33,19 @@ void game::on_client_event(const GenericValue<UTF8<>> &event)
 {
     if (string(event["event"].GetString()) == "connect_buzzergroup")
     {
-        string device_type = event["type"].GetString();
-        enum device_type type;
-        if (device_type == "serial")
+        string device_type_string = event["type"].GetString();
+        device_type type;
+        if (device_type_string == "serial")
         {
             type = device_type::SERIAL;
         }
-        else if (device_type == "keyboard")
+        else if (device_type_string == "keyboard")
         {
             type = device_type::KEYBOARD;
         }
         else
         {
-            throw jeopardy_exception("Unexpected buzzergroup type '" + device_type + "'");
+            throw jeopardy_exception("Unexpected buzzergroup type '" + device_type_string + "'");
         }
         buzzer_manager.connect(event["device"].GetString(), type);
         return;
