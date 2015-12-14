@@ -45,7 +45,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         unique_lock<recursive_mutex> lock(buzzorder_mutex);
         if (buzzorder.size() == 0)
             return false;
-        auto player = *buzzorder.begin();
+        player *player = *buzzorder.begin();
         player->add_score(-selected_answer->get_points());
         selected_answer->add_looser(player);
         buzzorder.clear();
@@ -91,10 +91,8 @@ void answer_screen::on_buzz(const buzzer &hit_buzzer)
     if (find(selected_answer->get_loosers().begin(), selected_answer->get_loosers().end(), &player) != selected_answer->get_loosers().end())
         return;
     player.set_buzztime(time);
-    {
-        unique_lock<recursive_mutex> lock(buzzorder_mutex);
-        buzzorder.push_back(&player);
-    }
+    unique_lock<recursive_mutex> lock(buzzorder_mutex);
+    buzzorder.push_back(&player);
     send_buzzorder();
 }
 
