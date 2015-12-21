@@ -11,14 +11,14 @@ using namespace rapidjson;
 game::game(int port)
 {
     this->reconnect_player = nullptr;
-    buzzer_manager.buzzer_hit.connect(bind(&game::on_buzzer_hit, this, _1));
-    buzzer_manager.buzzer_disconnected.connect(bind(&game::on_buzzer_disconnected, this, _1));
-    buzzer_manager.buzzergroup_connected.connect(bind(&game::on_buzzergroup_connected, this, _1, _2));
-    buzzer_manager.buzzergroup_connect_failed.connect(bind(&game::on_buzzergroup_connect_failed, this, _1, _2));
-    buzzer_manager.buzzergroup_disconnected.connect(bind(&game::on_buzzergroup_disconnected, this, _1, _2));
+    buzzer_manager.buzzer_hit.connect(bind(&game::on_buzzer_hit, this, placeholders::_1));
+    buzzer_manager.buzzer_disconnected.connect(bind(&game::on_buzzer_disconnected, this, placeholders::_1));
+    buzzer_manager.buzzergroup_connected.connect(bind(&game::on_buzzergroup_connected, this, placeholders::_1, placeholders::_2));
+    buzzer_manager.buzzergroup_connect_failed.connect(bind(&game::on_buzzergroup_connect_failed, this, placeholders::_1, placeholders::_2));
+    buzzer_manager.buzzergroup_disconnected.connect(bind(&game::on_buzzergroup_disconnected, this, placeholders::_1, placeholders::_2));
     state.reset(new new_game(&players, &categories, &server, &next_state));
-    server.connection_open.connect(bind(&game::on_client_connect, this, _1));
-    server.client_event.connect(bind(&game::on_client_event, this, _1));
+    server.connection_open.connect(bind(&game::on_client_connect, this, placeholders::_1));
+    server.client_event.connect(bind(&game::on_client_event, this, placeholders::_1));
     server.start_listen(port);
     server.run();
 }
