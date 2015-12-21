@@ -51,7 +51,7 @@ const string & player::get_name() const
     return name;
 }
 
-color player::get_color() const
+const color & player::get_color() const
 {
     return c;
 }

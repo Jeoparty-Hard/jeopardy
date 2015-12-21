@@ -29,7 +29,7 @@ public:
     void disconnect();
     const std::string & get_id() const;
     const std::string & get_name() const;
-    color get_color() const;
+    const color & get_color() const;
     int get_score() const;
     bool is_connected() const;
     const buzzer & get_buzzer() const;
