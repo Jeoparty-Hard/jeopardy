@@ -125,7 +125,7 @@ void new_game::current_state(rapidjson::Document &d)
     rounds_value.SetObject();
     for (auto it = rounds.begin();it != rounds.end();it++)
     {
-        round &round = rounds.at(it->first);
+        jeopardy_round &round = rounds.at(it->first);
         cout << it->first << " " << round.get_id() << endl;
         rounds_value.AddMember(Value(round.get_id().c_str(), round.get_id().size()), Value(round.get_name().c_str(), round.get_name().size()), d.GetAllocator());
     }
