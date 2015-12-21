@@ -45,7 +45,7 @@ new_game::new_game(list<player> *players, vector<category> *categories, websocke
         path current_directory = *it;
         if (!is_directory(rounds_dir))
         {
-            cerr << "Rounds directory not found!" << endl; // TODO Better message
+            cerr << "Directory 'rounds/' not found" << endl;
             continue;
         }
         path json_file = current_directory / "round.json";
@@ -58,9 +58,9 @@ new_game::new_game(list<player> *players, vector<category> *categories, websocke
         Document d;
         valijson::utils::loadFile(json_file.string(), json);
         d.Parse(json.c_str());
-        if (schema_doc.HasParseError())
+        if (d.HasParseError())
         {
-            cerr << "Error in schema" << endl; // TODO Better message
+            cerr << "Error while parsing " << json_file << ": " << GetParseError_En(d.GetParseError()) << endl;
             continue;
         }
 
@@ -70,7 +70,7 @@ new_game::new_game(list<player> *players, vector<category> *categories, websocke
 
         if (!validator.validate(targetAdapter, &results))
         {
-            cerr << "Couldn't validate" << endl; // TODO Better message
+            cerr << "Cannot validate " << json_file <<  ": " << GetParseError_En(d.GetParseError()) << endl;
             continue;
         }
 
