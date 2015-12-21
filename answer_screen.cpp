@@ -18,7 +18,7 @@ answer_screen::answer_screen(answer *selected_answer, list<player> *players, vec
 
 void answer_screen::initialize()
 {
-    for (auto &player : players)
+    for (player &player : players)
     {
         player.reset_buzztime();
     }
@@ -35,7 +35,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         unique_lock<recursive_mutex> lock(buzzorder_mutex);
         if (buzzorder.size() == 0)
             return false;
-        auto player = *buzzorder.begin();
+        player *player = *buzzorder.begin();
         player->add_score(selected_answer->get_points());
         selected_answer->set_winner(player);
         next_state.reset(new scoreboard(player, &players, &categories, &server, &next_state));
@@ -65,7 +65,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         if (buzzorder.size() > 0)
             return false;
         player *next_player = nullptr;
-        for (auto &player : players)
+        for (player &player : players)
         {
             if (next_player == nullptr)
                 next_player = &player;
@@ -85,7 +85,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
 void answer_screen::on_buzz(const buzzer &hit_buzzer)
 {
     duration<int, milli> time = duration_cast<milliseconds>(high_resolution_clock::now() - start);
-    auto &player = *find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.is_connected() && player.get_buzzer() == hit_buzzer;});
+    player &player = *find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.is_connected() && player.get_buzzer() == hit_buzzer;});
     if (player.has_buzzed())
         return;
     if (find(selected_answer->get_loosers().begin(), selected_answer->get_loosers().end(), &player) != selected_answer->get_loosers().end())
@@ -120,7 +120,7 @@ void answer_screen::make_buzzorder(GenericValue<UTF8<>> &root, Document::Allocat
     bool first_buzz = true;
     duration<int, milli> first_time;
     unique_lock<recursive_mutex> lock(buzzorder_mutex);
-    for (auto player : buzzorder)
+    for (player *player : buzzorder)
     {
         if (!player->has_buzzed())
             continue;

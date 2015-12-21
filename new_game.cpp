@@ -94,9 +94,9 @@ bool new_game::process_event(const GenericValue<UTF8<>> &event)
         {
             jeopardy_round &round = rounds.at(round_id);
             categories = round.get_categories();
-            for (auto &category : categories)
+            for (category &category : categories)
             {
-                for (auto &answer : category.get_mutable_answers())
+                for (answer &answer : category.get_mutable_answers())
                 {
                     answer.load_data();
                 }
@@ -125,7 +125,7 @@ void new_game::current_state(rapidjson::Document &d)
     rounds_value.SetObject();
     for (auto it = rounds.begin();it != rounds.end();it++)
     {
-        auto &round = rounds.at(it->first);
+        round &round = rounds.at(it->first);
         cout << it->first << " " << round.get_id() << endl;
         rounds_value.AddMember(Value(round.get_id().c_str(), round.get_id().size()), Value(round.get_name().c_str(), round.get_name().size()), d.GetAllocator());
     }

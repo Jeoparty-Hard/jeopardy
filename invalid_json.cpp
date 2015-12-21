@@ -20,10 +20,10 @@ invalid_json::invalid_json(valijson::ValidationResults::Error error)
 const char* invalid_json::what() const noexcept
 {
     string what_data = "";
-    for (auto &error : errors)
+    for (const valijson::ValidationResults::Error &error : errors)
     {
         what_data += error.description + "\nin\n";
-        for (auto context : error.context)
+        for (const std::string &context : error.context)
         {
             what_data += context + "\n";
         }

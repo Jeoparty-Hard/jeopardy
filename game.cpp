@@ -58,7 +58,7 @@ void game::on_client_event(const GenericValue<UTF8<>> &event)
         auto it = find_if(players.begin(), players.end(), [player_id](const player &player){return player.get_id() == player_id;});
         if (it == players.end())
             return;
-        auto &player = *it;
+        player &player = *it;
         if (player.is_connected())
             throw jeopardy_exception("Player '" + player.get_name() + "' is already connected");
         if (reconnect_player != nullptr)
@@ -108,7 +108,7 @@ void game::on_buzzer_disconnected(const buzzer &disconnected_buzzer)
     auto it = find_if(players.begin(), players.end(), [disconnected_buzzer](const player &player){return player.is_connected() && player.get_buzzer() == disconnected_buzzer;});
     if (it != players.end())
         return;
-    auto &player = *it;
+    player &player = *it;
     player.disconnect();
     Document d;
     state->current_state(d);
@@ -136,7 +136,7 @@ void game::on_buzzergroup_connect_failed(std::string device, std::string error_m
 
 void game::on_buzzergroup_disconnected(std::string device, disconnect_reason reason)
 {
-    for (auto &player : players)
+    for (player &player : players)
     {
         if (!player.is_connected() || player.get_buzzer().device != device)
             continue;
@@ -155,14 +155,14 @@ void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vec
     bool first = true;
     Value categoriesValue;
     categoriesValue.SetArray();
-    for (auto &category : categories)
+    for (const category &category : categories)
     {
         Value categoryValue;
         categoryValue.SetObject();
         categoryValue.AddMember("name", Value(category.get_name().c_str(), category.get_name().size()), allocator);
         Value winners;
         winners.SetArray();
-        for (auto &answer : category.get_answers())
+        for (const answer &answer : category.get_answers())
         {
             winners.PushBack(answer.winner_value(), allocator);
             if (first)
@@ -179,7 +179,7 @@ void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vec
 void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<player> &players, GenericValue<UTF8<>>::AllocatorType &allocator)
 {
     root.SetObject();
-    for (auto &player : players)
+    for (const player &player : players)
     {
         Value playerValue;
         playerValue.SetObject();
