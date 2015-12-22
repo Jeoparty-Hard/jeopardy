@@ -47,8 +47,8 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
             return false;
         player *player = *buzzorder.begin();
         player->add_score(-selected_answer->get_points());
-        selected_answer->add_looser(player);
-        buzzorder.clear();
+        // TODO Inform clients about new score
+        initialize();
         send_buzzorder();
     }
     else if (event_type == "oops")
@@ -87,8 +87,6 @@ void answer_screen::on_buzz(const buzzer &hit_buzzer)
     duration<int, milli> time = duration_cast<milliseconds>(high_resolution_clock::now() - start);
     player &player = *find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.is_connected() && player.get_buzzer() == hit_buzzer;});
     if (player.has_buzzed())
-        return;
-    if (find(selected_answer->get_loosers().begin(), selected_answer->get_loosers().end(), &player) != selected_answer->get_loosers().end())
         return;
     player.set_buzztime(time);
     unique_lock<recursive_mutex> lock(buzzorder_mutex);

@@ -18,16 +18,13 @@ private:
     boost::filesystem::path category_path;
     bool has_winner;
     player *winner;
-    std::list<player*> loosers;
 public:
     answer() = default;
     answer(const rapidjson::GenericValue<rapidjson::UTF8<>> &, boost::filesystem::path category_path, unsigned int points);
     void set_winner(player *winner);
-    void add_looser(player *looser);
     const std::string & get_type() const;
     const std::string & get_data() const;
     unsigned int get_points() const;
-    const std::list<player*> & get_loosers() const;
     rapidjson::GenericValue<rapidjson::UTF8<>> winner_value() const;
     void load_data();
 };
