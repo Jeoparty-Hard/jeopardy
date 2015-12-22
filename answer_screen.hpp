@@ -2,6 +2,7 @@
 #define JEOPARDY_ANSWER_SCREEN_H
 
 #include <chrono>
+#include <mutex>
 
 #include "game_state.hpp"
 

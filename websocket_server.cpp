@@ -12,6 +12,9 @@
 #include <valijson/utils/file_utils.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
+#include <valijson/validator.hpp>
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/server.hpp>
 
 #include "jeopardy_exception.hpp"
 #include "invalid_json.hpp"
@@ -22,12 +25,23 @@ using namespace boost::filesystem;
 using namespace rapidjson;
 using namespace websocketpp;
 
-websocket_server::websocket_server()
+typedef std::map<std::string, std::unique_ptr<valijson::Validator>> validators_t;
+
+struct websocket_server::data_t
 {
-    this->init_asio();
-    this->set_open_handler(bind(&websocket_server::on_connection_open, this, placeholders::_1));
-    this->set_close_handler(bind(&websocket_server::on_connection_close, this, placeholders::_1));
-    this->set_message_handler(bind(&websocket_server::on_message, this, placeholders::_1, placeholders::_2));
+    websocketpp::server<websocketpp::config::asio> server;
+    validators_t validators;
+};
+
+static void on_message(websocket_server *, validators_t *, websocketpp::connection_hdl, server<websocketpp::config::asio>::message_ptr);
+
+websocket_server::websocket_server()
+    : data (new data_t)
+{
+    this->data->server.init_asio();
+    this->data->server.set_open_handler(bind(&websocket_server::on_connection_open, this, placeholders::_1));
+    this->data->server.set_close_handler(bind(&websocket_server::on_connection_close, this, placeholders::_1));
+    this->data->server.set_message_handler(bind(on_message, this, &this->data->validators, placeholders::_1, placeholders::_2));
 
     // Initialize json validators
     path schema_dir = path("json-schema") / "events";
@@ -56,19 +70,24 @@ websocket_server::websocket_server()
         valijson::SchemaParser parser;
         valijson::adapters::RapidJsonAdapter schemaAdapter(schema_doc);
         parser.populateSchema(schemaAdapter, schema);
-        validators.emplace(file.stem().string(), unique_ptr<valijson::Validator>(new valijson::Validator(schema)));
+        this->data->validators.emplace(file.stem().string(), unique_ptr<valijson::Validator>(new valijson::Validator(schema)));
     }
+}
+
+websocket_server::~websocket_server()
+{
+
 }
 
 void websocket_server::start_listen(int port)
 {
-    this->set_reuse_addr(true);
-    this->listen(port);
+    this->data->server.set_reuse_addr(true);
+    this->data->server.listen(port);
     boost::system::error_code ec;
-    this->start_accept();
+    this->data->server.start_accept();
 }
 
-void websocket_server::on_message(connection_hdl hdl, message_ptr message)
+void on_message(websocket_server *server, validators_t *validators, connection_hdl hdl, websocketpp::server<websocketpp::config::asio>::message_ptr message)
 {
     try
     {
@@ -82,13 +101,13 @@ void websocket_server::on_message(connection_hdl hdl, message_ptr message)
         valijson::adapters::RapidJsonAdapter targetAdapter(d);
         valijson::ValidationResults results;
 
-        if (!validators["basic"]->validate(targetAdapter, &results))
+        if (!(*validators)["basic"]->validate(targetAdapter, &results))
             throw invalid_json(results);
 
         string event = d["event"].GetString();
         try
         {
-            if (!validators.at(event)->validate(targetAdapter, &results))
+            if (!validators->at(event)->validate(targetAdapter, &results))
                 throw invalid_json(valijson::ValidationResults::Error({message->get_payload()}, GetParseError_En(d.GetParseError())));
         }
         catch (out_of_range &)
@@ -96,10 +115,10 @@ void websocket_server::on_message(connection_hdl hdl, message_ptr message)
             throw invalid_json(valijson::ValidationResults::Error({message->get_payload()}, "Unknown event '" + event + "'"));
         }
         if (event == "ready") {
-            connection_open.raise(hdl);
+            server->connection_open.raise(hdl);
             return;
         }
-        client_event.raise(d);
+        server->client_event.raise(d);
     }
     catch (invalid_json &e)
     {
@@ -123,7 +142,7 @@ void websocket_server::on_message(connection_hdl hdl, message_ptr message)
             errors.PushBack(errValue, d.GetAllocator());
         }
         d.AddMember("errors", errors, d.GetAllocator());
-        this->broadcast(d);
+        server->broadcast(d);
     }
     catch (jeopardy_exception &e)
     {
@@ -131,7 +150,7 @@ void websocket_server::on_message(connection_hdl hdl, message_ptr message)
         d.SetObject();
         d.AddMember("error", "jeopardy_exception", d.GetAllocator());
         d.AddMember("message", Value(e.what(), string(e.what()).size()), d.GetAllocator());
-        this->broadcast(d);
+        server->broadcast(d);
     }
     catch (std::exception &e)
     {
@@ -139,7 +158,7 @@ void websocket_server::on_message(connection_hdl hdl, message_ptr message)
         d.SetObject();
         d.AddMember("error", "exception", d.GetAllocator());
         d.AddMember("message", Value(e.what(), string(e.what()).size()), d.GetAllocator());
-        this->broadcast(d);
+        server->broadcast(d);
     }
 }
 
@@ -160,7 +179,7 @@ void websocket_server::send_document(websocketpp::connection_hdl hdl, const rapi
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
     string json = buffer.GetString();
-    this->send(hdl, json, frame::opcode::value::TEXT);
+    this->data->server.send(hdl, json, frame::opcode::value::TEXT);
 }
 
 void websocket_server::broadcast(const Document &data)
@@ -171,17 +190,22 @@ void websocket_server::broadcast(const Document &data)
     string json = buffer.GetString();
     for (const connection_hdl &hdl : connections)
     {
-        this->send(hdl, json, frame::opcode::value::TEXT);
+        this->data->server.send(hdl, json, frame::opcode::value::TEXT);
     }
 }
 
 void websocket_server::shutdown()
 {
     // TODO Call in destructor
-    this->stop_listening();
+    this->data->server.stop_listening();
     for (const connection_hdl &hdl : connections)
     {
-        this->close(hdl, 0, "Server shutting down");
+        this->data->server.close(hdl, 0, "Server shutting down");
     }
-    this->stop();
+    this->data->server.stop();
+}
+
+void websocket_server::run()
+{
+    this->data->server.run();
 }
