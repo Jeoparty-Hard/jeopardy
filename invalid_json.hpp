@@ -13,6 +13,7 @@ protected:
 public:
     invalid_json(valijson::ValidationResults results);
     invalid_json(valijson::ValidationResults::Error error);
+    invalid_json(std::string error_message);
     virtual ~invalid_json() = default;
     virtual const char* what() const noexcept;
     const std::vector<valijson::ValidationResults::Error> & get_errors() const;

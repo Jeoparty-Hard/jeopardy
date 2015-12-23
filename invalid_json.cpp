@@ -17,6 +17,12 @@ invalid_json::invalid_json(valijson::ValidationResults::Error error)
     // Nothing to do
 }
 
+invalid_json::invalid_json(string error_message)
+    : errors({valijson::ValidationResults::Error({"no context"}, error_message)})
+{
+    // Noting to do
+}
+
 const char* invalid_json::what() const noexcept
 {
     string what_data = "";

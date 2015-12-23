@@ -19,6 +19,7 @@ set(SOURCE_FILES
         main.cpp
         new_game.cpp
         player.cpp
+        round_loader.cpp
         scoreboard.cpp
         setup_game.cpp
         websocket_server.cpp

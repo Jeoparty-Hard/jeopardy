@@ -1,16 +1,7 @@
 #include "new_game.hpp"
 
-#include <boost/filesystem.hpp>
-
-#include <rapidjson/error/en.h>
-#include <valijson/adapters/rapidjson_adapter.hpp>
-#include <valijson/utils/file_utils.hpp>
-#include <valijson/schema.hpp>
-#include <valijson/schema_parser.hpp>
-#include <valijson/validator.hpp>
-
-#include "invalid_json.hpp"
 #include "jeopardy_exception.hpp"
+#include "round_loader.hpp"
 #include "setup_game.hpp"
 
 using namespace std;
@@ -20,61 +11,9 @@ using namespace rapidjson;
 new_game::new_game(list<player> *players, vector<category> *categories, websocket_server *server, unique_ptr<game_state> *next_state)
     : game_state(players, categories, server, next_state)
 {
-    path rounds_dir = "rounds";
-    if (!is_directory(rounds_dir))
-        throw jeopardy_exception("'" + rounds_dir.string() + "' is not a directory");
-
-    // Initialize json validator
-    path schema_file = path("json-schema") / "files" / "round.json";
-    if (!is_regular_file(schema_file))
-        throw jeopardy_exception("'" + schema_file.string() + "' is not a regular file");
-    Document schema_doc;
-    string json;
-    valijson::utils::loadFile(schema_file.string(), json);
-    schema_doc.Parse(json.c_str());
-    if (schema_doc.HasParseError())
-        throw invalid_json(valijson::ValidationResults::Error({schema_file.string()}, GetParseError_En(schema_doc.GetParseError())));
-
-    valijson::Schema schema;
-    valijson::SchemaParser parser;
-    valijson::adapters::RapidJsonAdapter schemaAdapter(schema_doc);
-    parser.populateSchema(schemaAdapter, schema);
-
-    for (directory_iterator it(rounds_dir), end;it != end;it++)
+    for (jeopardy_round &round : round_loader::load_rounds())
     {
-        path current_directory = *it;
-        if (!is_directory(rounds_dir))
-        {
-            cerr << "Directory 'rounds/' not found" << endl;
-            continue;
-        }
-        path json_file = current_directory / "round.json";
-        if (!is_regular_file(json_file))
-        {
-            cerr << "round.json is not a file!" << endl;
-            continue;
-        }
-
-        Document d;
-        valijson::utils::loadFile(json_file.string(), json);
-        d.Parse(json.c_str());
-        if (d.HasParseError())
-        {
-            cerr << "Error while parsing " << json_file << ": " << GetParseError_En(d.GetParseError()) << endl;
-            continue;
-        }
-
-        valijson::Validator validator(schema);
-        valijson::adapters::RapidJsonAdapter targetAdapter(d);
-        valijson::ValidationResults results;
-
-        if (!validator.validate(targetAdapter, &results))
-        {
-            cerr << "Cannot validate " << json_file <<  ": " << GetParseError_En(d.GetParseError()) << endl;
-            continue;
-        }
-
-        rounds.emplace(current_directory.filename().string(), jeopardy_round(current_directory.filename().string(), d, current_directory));
+        rounds.emplace(round.get_id(), move(round));
     }
 }
 
@@ -126,7 +65,6 @@ void new_game::current_state(rapidjson::Document &d)
     for (auto it = rounds.begin();it != rounds.end();it++)
     {
         jeopardy_round &round = rounds.at(it->first);
-        cout << it->first << " " << round.get_id() << endl;
         rounds_value.AddMember(Value(round.get_id().c_str(), round.get_id().size()), Value(round.get_name().c_str(), round.get_name().size()), d.GetAllocator());
     }
     d.AddMember("rounds", rounds_value, d.GetAllocator());
