@@ -1,6 +1,7 @@
 #include "game.hpp"
 
 #include <functional>
+#include <iostream>
 
 #include "jeopardy_exception.hpp"
 #include "new_game.hpp"
@@ -21,6 +22,7 @@ game::game(int port)
     server.client_event.connect(bind(&game::on_client_event, this, placeholders::_1));
     server.start_listen(port);
     server.run();
+    cout << "Listening..." << endl;
 }
 
 void game::on_client_connect(websocketpp::connection_hdl hdl)
