@@ -10,8 +10,8 @@ using namespace std;
 using namespace std::chrono;
 using namespace rapidjson;
 
-answer_screen::answer_screen(answer *selected_answer, list<player> *players, vector<category> *categories, websocket_server *server, unique_ptr<game_state> *next_state)
-    : game_state(players, categories, server, next_state)
+answer_screen::answer_screen(answer *selected_answer, struct game_state_params *params)
+    : game_state(params)
 {
     this->selected_answer = selected_answer;
 }
@@ -38,7 +38,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         player *player = *buzzorder.begin();
         player->add_score(selected_answer->get_points());
         selected_answer->set_winner(player);
-        next_state.reset(new scoreboard(player, &players, &categories, &server, &next_state));
+        next_state.reset(new scoreboard(player, params));
     }
     else if (event_type == "fail")
     {
@@ -73,7 +73,7 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
                 next_player = &player;
         }
         selected_answer->set_winner(nullptr);
-        next_state.reset(new scoreboard(next_player, &players, &categories, &server, &next_state));
+        next_state.reset(new scoreboard(next_player, params));
     }
     else
     {
@@ -85,7 +85,10 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
 void answer_screen::on_buzz(const buzzer &hit_buzzer)
 {
     duration<int, milli> time = duration_cast<milliseconds>(high_resolution_clock::now() - start);
-    player &player = *find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.is_connected() && player.get_buzzer() == hit_buzzer;});
+    auto it = find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.is_connected() && player.get_buzzer() == hit_buzzer;});
+    if (it == players.end())
+        return;
+    player &player = *it;
     if (player.has_buzzed())
         return;
     player.set_buzztime(time);
@@ -145,4 +148,20 @@ void answer_screen::send_buzzorder()
     make_buzzorder(buzzorderValue, d.GetAllocator());
     d.AddMember("buzzorder", buzzorderValue, d.GetAllocator());
     server.broadcast(d);
+}
+
+void answer_screen::store_state(rapidjson::Document &root)
+{
+    root.AddMember("state", "answer_screen", root.GetAllocator());
+    game_state::store_state(root);
+    root.AddMember("answer_col", selected_answer->get_col(), root.GetAllocator());
+    root.AddMember("answer_row", selected_answer->get_row(), root.GetAllocator());
+    Value buzzorderValue;
+    buzzorderValue.SetArray();
+    for (player *player : buzzorder)
+    {
+        buzzorderValue.PushBack(Value(player->get_id().c_str(), player->get_id().size()), root.GetAllocator());
+    }
+    root.AddMember("buzzorder", buzzorderValue, root.GetAllocator());
+    root.AddMember("start", start.time_since_epoch().count(), root.GetAllocator());
 }

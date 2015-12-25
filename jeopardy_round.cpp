@@ -20,7 +20,7 @@ jeopardy_round::jeopardy_round(string id, const rapidjson::GenericValue<rapidjso
 
     for (size_t i = 0;i < size;i++)
     {
-        this->categories[i] = category(categories[i], round_path, points);
+        this->categories[i] = category(categories[i], round_path, points, i);
     }
 }
 

@@ -7,14 +7,14 @@
 using namespace std;
 using namespace rapidjson;
 
-scoreboard::scoreboard(player *current_player, list<player> *players, vector<category> *categories, websocket_server *server, unique_ptr<game_state> *next_state)
-        : game_state(players, categories, server, next_state)
+scoreboard::scoreboard(player *current_player, struct game_state_params *params)
+        : game_state(params)
 {
     this->current_player = current_player;
 }
 
-scoreboard::scoreboard(list<player> *players, vector<category> *categories, websocket_server *server, unique_ptr<game_state> *next_state)
-        : scoreboard(nullptr, players, categories, server, next_state)
+scoreboard::scoreboard(struct game_state_params *params)
+        : scoreboard(nullptr, params)
 {
     // Nothing to do
 }
@@ -34,7 +34,7 @@ bool scoreboard::process_event(const GenericValue<UTF8<>> &event)
         int answer_id = event["answer"].GetInt();
         try
         {
-            next_state.reset(new answer_screen(&categories.at(category_id).get_mutable_answers().at(answer_id), &players, &categories, &server, &next_state));
+            next_state.reset(new answer_screen(&categories.at(category_id).get_mutable_answers().at(answer_id), params));
         }
         catch (out_of_range &)
         {
@@ -64,4 +64,11 @@ void scoreboard::current_state(rapidjson::Document &d)
     game::list_players(playersValue, players, d.GetAllocator());
     d.AddMember("players", playersValue, d.GetAllocator());
     d.AddMember("current_player", Value(current_player->get_name().c_str(), current_player->get_name().size()), d.GetAllocator());
+}
+
+void scoreboard::store_state(rapidjson::Document &root)
+{
+    root.AddMember("state", "scoreboard", root.GetAllocator());
+    game_state::store_state(root);
+    root.AddMember("current_player", Value(current_player->get_id().c_str(), current_player->get_id().size()), root.GetAllocator());
 }

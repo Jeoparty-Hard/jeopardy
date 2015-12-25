@@ -11,6 +11,7 @@
 class answer
 {
 private:
+    unsigned int col, row;
     std::string type;
     unsigned int points;
     std::string data;
@@ -20,11 +21,13 @@ private:
     player *winner;
 public:
     answer() = default;
-    answer(const rapidjson::GenericValue<rapidjson::UTF8<>> &, boost::filesystem::path category_path, unsigned int points);
+    answer(const rapidjson::GenericValue<rapidjson::UTF8<>> &, boost::filesystem::path category_path, unsigned int points, unsigned int col, unsigned int row);
     void set_winner(player *winner);
     const std::string & get_type() const;
     const std::string & get_data() const;
     unsigned int get_points() const;
+    unsigned int get_col() const;
+    unsigned int get_row() const;
     rapidjson::GenericValue<rapidjson::UTF8<>> winner_value() const;
     void load_data();
 };

@@ -8,13 +8,13 @@ class scoreboard : public game_state
 private:
     player *current_player;
 public:
-    scoreboard(std::list<player> *players, std::vector<category> *categories, websocket_server *server, std::unique_ptr<game_state> *next_state);
-    scoreboard(player *current_player, std::list<player> *players, std::vector<category> *categories, websocket_server *server, std::unique_ptr<game_state> *next_state);
+    scoreboard(struct game_state_params *params);
+    scoreboard(player *current_player, struct game_state_params *params);
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);
     virtual void on_buzz(const buzzer &);
     virtual void current_state(rapidjson::Document &);
-
+    virtual void store_state(rapidjson::Document &);
 };
 
 #endif //JEOPARDY_SCOREBOARD_H

@@ -14,12 +14,13 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::recursive_mutex buzzorder_mutex;
 public:
-    answer_screen(answer *selected_answer, std::list<player> *players, std::vector<category> *categories, websocket_server *server, std::unique_ptr<game_state> *next_state);
+    answer_screen(answer *selected_answer, struct game_state_params *params);
     virtual ~answer_screen() = default;
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);
     virtual void on_buzz(const buzzer &);
     virtual void current_state(rapidjson::Document &);
+    virtual void store_state(rapidjson::Document &);
     void make_buzzorder(rapidjson::GenericValue<rapidjson::UTF8<>> &, rapidjson::Document::AllocatorType &);
     void send_buzzorder();
 };

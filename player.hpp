@@ -36,6 +36,7 @@ public:
     bool has_buzzed() const;
     const std::chrono::duration<int, std::milli> & get_buzztime() const;
     rapidjson::GenericValue<rapidjson::UTF8<>> buzzed_value() const;
+    void store_state(rapidjson::GenericValue<rapidjson::UTF8<>> &, rapidjson::GenericValue<rapidjson::UTF8<>>::AllocatorType &) const;
 };
 
 #endif //JEOPARDY_PLAYER_H

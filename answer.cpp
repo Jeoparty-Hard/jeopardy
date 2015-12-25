@@ -9,8 +9,10 @@ using namespace std;
 using namespace boost::filesystem;
 using namespace rapidjson;
 
-answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned int points)
+answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned int points, unsigned int col, unsigned int row)
 {
+    this->col = col;
+    this->row = row;
     this->type = answer["type"].GetString();
     this->data = answer["data"].GetString();
     this->points = points;
@@ -39,6 +41,16 @@ const string & answer::get_data() const
 unsigned int answer::get_points() const
 {
     return points;
+}
+
+unsigned int answer::get_col() const
+{
+    return col;
+}
+
+unsigned int answer::get_row() const
+{
+    return row;
 }
 
 rapidjson::GenericValue<rapidjson::UTF8<>> answer::winner_value() const

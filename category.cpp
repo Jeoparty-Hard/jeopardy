@@ -13,7 +13,7 @@ const string & category::get_name() const
     return name;
 }
 
-category::category(const GenericValue<UTF8<>> &category, path round_path, const std::vector<unsigned int> &points)
+category::category(const GenericValue<UTF8<>> &category, path round_path, const std::vector<unsigned int> &points, unsigned int col)
 {
     this->name = category["name"].GetString();
     auto &answers = category["answers"];
@@ -26,7 +26,7 @@ category::category(const GenericValue<UTF8<>> &category, path round_path, const 
     path category_path = round_path / category["path"].GetString();
     for (SizeType i = 0;i < size;i++)
     {
-        this->answers[i] = answer(answers[i], category_path, points[i]);
+        this->answers[i] = answer(answers[i], category_path, points[i], col, i);
     }
 }
 

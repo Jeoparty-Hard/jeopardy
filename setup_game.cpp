@@ -7,8 +7,8 @@
 using namespace std;
 using namespace rapidjson;
 
-setup_game::setup_game(list<player> *players, vector<category> *categories, websocket_server *server, unique_ptr<game_state> *next_state)
-        : game_state(players, categories, server, next_state)
+setup_game::setup_game(struct game_state_params *params)
+        : game_state(params)
 {
     this->next_player_id = 0;
     this->edit_player_active = false;
@@ -61,7 +61,7 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
             return false;
         if (players.size() < 1)
             throw jeopardy_exception("At least one player is required to start the game");
-        next_state.reset(new scoreboard(&players, &categories, &server, &next_state));
+        next_state.reset(new scoreboard(params));
     }
     else
     {
@@ -104,4 +104,10 @@ void setup_game::current_state(rapidjson::Document &d)
         new_player.AddMember("connected", current_player_connected, d.GetAllocator());
     }
     d.AddMember("new_player", new_player, d.GetAllocator());
+}
+
+void setup_game::store_state(rapidjson::Document &root)
+{
+    root.AddMember("state", "setup_game", root.GetAllocator());
+    game_state::store_state(root);
 }

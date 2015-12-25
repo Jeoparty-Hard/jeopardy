@@ -8,8 +8,8 @@ using namespace std;
 using namespace boost::filesystem;
 using namespace rapidjson;
 
-new_game::new_game(list<player> *players, vector<category> *categories, websocket_server *server, unique_ptr<game_state> *next_state)
-    : game_state(players, categories, server, next_state)
+new_game::new_game(struct game_state_params *params)
+    : game_state(params)
 {
     for (jeopardy_round &round : round_loader::load_rounds())
     {
@@ -40,7 +40,7 @@ bool new_game::process_event(const GenericValue<UTF8<>> &event)
                     answer.load_data();
                 }
             }
-            next_state.reset(new setup_game(&players, &categories, &server, &next_state));
+            next_state.reset(new setup_game(params));
         }
         catch (out_of_range &)
         {
@@ -68,4 +68,10 @@ void new_game::current_state(rapidjson::Document &d)
         rounds_value.AddMember(Value(round.get_id().c_str(), round.get_id().size()), Value(round.get_name().c_str(), round.get_name().size()), d.GetAllocator());
     }
     d.AddMember("rounds", rounds_value, d.GetAllocator());
+}
+
+void new_game::store_state(rapidjson::Document &root)
+{
+    root.AddMember("state", "new_game", root.GetAllocator());
+    game_state::store_state(root);
 }
