@@ -53,13 +53,13 @@ unsigned int answer::get_row() const
     return row;
 }
 
-rapidjson::GenericValue<rapidjson::UTF8<>> answer::winner_value() const
+rapidjson::GenericValue<rapidjson::UTF8<>> answer::winner_value(GenericValue<UTF8<>>::AllocatorType &allocator) const
 {
     if (!has_winner)
         return Value();
     if (winner == nullptr)
         return Value(false);
-    return Value(winner->get_id().c_str(), winner->get_id().size());
+    return Value(winner->get_id(), allocator);
 }
 
 void answer::load_data()

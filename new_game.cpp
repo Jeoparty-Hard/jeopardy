@@ -69,7 +69,7 @@ void new_game::current_state(rapidjson::Document &d)
     for (auto it = rounds.begin();it != rounds.end();it++)
     {
         jeopardy_round &round = rounds.at(it->first);
-        rounds_value.AddMember(Value(round.get_id().c_str(), round.get_id().size()), Value(round.get_name().c_str(), round.get_name().size()), d.GetAllocator());
+        rounds_value.AddMember(Value(round.get_id(), d.GetAllocator()), Value(round.get_name(), d.GetAllocator()), d.GetAllocator());
     }
     d.AddMember("rounds", rounds_value, d.GetAllocator());
 }

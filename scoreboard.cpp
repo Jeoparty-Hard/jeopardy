@@ -64,12 +64,12 @@ void scoreboard::current_state(rapidjson::Document &d)
     Value playersValue;
     game::list_players(playersValue, players, d.GetAllocator());
     d.AddMember("players", playersValue, d.GetAllocator());
-    d.AddMember("current_player", Value(current_player->get_id().c_str(), current_player->get_id().size()), d.GetAllocator());
+    d.AddMember("current_player", Value(current_player->get_id(), d.GetAllocator()), d.GetAllocator());
 }
 
 void scoreboard::store_state(rapidjson::Document &root)
 {
     root.AddMember("state", "scoreboard", root.GetAllocator());
     game_state::store_state(root);
-    root.AddMember("current_player", Value(current_player->get_id().c_str(), current_player->get_id().size()), root.GetAllocator());
+    root.AddMember("current_player", Value(current_player->get_id(), root.GetAllocator()), root.GetAllocator());
 }

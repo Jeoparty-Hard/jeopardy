@@ -152,7 +152,7 @@ void game::on_buzzergroup_connected(std::string device, const std::set<unsigned 
     Document d;
     d.SetObject();
     d.AddMember("connection", "successfull", d.GetAllocator());
-    d.AddMember("device", Value(device.c_str(), device.size()), d.GetAllocator());
+    d.AddMember("device", Value(device, d.GetAllocator()), d.GetAllocator());
     data.server.broadcast(d);
 }
 
@@ -161,8 +161,8 @@ void game::on_buzzergroup_connect_failed(std::string device, std::string error_m
     Document d;
     d.SetObject();
     d.AddMember("error", "connect_failed", d.GetAllocator());
-    d.AddMember("device", Value(device.c_str(), device.size()), d.GetAllocator());
-    d.AddMember("message", Value(error_message.c_str(), error_message.size()), d.GetAllocator());
+    d.AddMember("device", Value(device, d.GetAllocator()), d.GetAllocator());
+    d.AddMember("message", Value(error_message, d.GetAllocator()), d.GetAllocator());
     data.server.broadcast(d);
 }
 
@@ -191,12 +191,12 @@ void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vec
     {
         Value categoryValue;
         categoryValue.SetObject();
-        categoryValue.AddMember("name", Value(category.get_name().c_str(), category.get_name().size()), allocator);
+        categoryValue.AddMember("name", Value(category.get_name(), allocator), allocator);
         Value winners;
         winners.SetArray();
         for (const answer &answer : category.get_answers())
         {
-            winners.PushBack(answer.winner_value(), allocator);
+            winners.PushBack(answer.winner_value(allocator), allocator);
             if (first)
                 points.PushBack(answer.get_points(), allocator);
         }
@@ -215,9 +215,9 @@ void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<p
     {
         Value playerValue;
         playerValue.SetObject();
-        playerValue.AddMember("id", Value(player.get_id().c_str(), player.get_id().size()), allocator);
-        playerValue.AddMember("name", Value(player.get_name().c_str(), player.get_name().size()), allocator);
-        playerValue.AddMember("color", Value(player.get_color().string().c_str(), player.get_color().string().size()), allocator);
+        playerValue.AddMember("id", Value(player.get_id(), allocator), allocator);
+        playerValue.AddMember("name", Value(player.get_name(), allocator), allocator);
+        playerValue.AddMember("color", Value(player.get_color().string(), allocator), allocator);
         playerValue.AddMember("score", player.get_score(), allocator);
         playerValue.AddMember("buzzed", player.buzzed_value(), allocator);
         playerValue.AddMember("connected", player.is_connected(), allocator);

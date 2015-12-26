@@ -91,9 +91,9 @@ GenericValue<UTF8<>> player::buzzed_value() const
 void player::store_state(GenericValue<rapidjson::UTF8<>> &root, GenericValue<UTF8<>>::AllocatorType &allocator) const
 {
     root.SetObject();
-    root.AddMember("id", Value(id.c_str(), id.size()), allocator);
-    root.AddMember("name", Value(name.c_str(), name.size()), allocator);
-    root.AddMember("color", Value(c.string().c_str(), c.string().size()), allocator);
+    root.AddMember("id", Value(id, allocator), allocator);
+    root.AddMember("name", Value(name, allocator), allocator);
+    root.AddMember("color", Value(c.string(), allocator), allocator);
     root.AddMember("score", score, allocator);
     root.AddMember("buzzed", buzzed, allocator);
     root.AddMember("buzztime", buzztime.count(), allocator);

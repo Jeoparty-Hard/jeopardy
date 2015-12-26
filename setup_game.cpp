@@ -104,8 +104,8 @@ void setup_game::current_state(rapidjson::Document &d)
     if (edit_player_active)
     {
         new_player.SetObject();
-        new_player.AddMember("name", Value(current_playername.c_str(), current_playername.size()), d.GetAllocator());
-        new_player.AddMember("color", Value(playercolor.string().c_str(), playercolor.string().size()), d.GetAllocator());
+        new_player.AddMember("name", Value(current_playername, d.GetAllocator()), d.GetAllocator());
+        new_player.AddMember("color", Value(playercolor.string(), d.GetAllocator()), d.GetAllocator());
         new_player.AddMember("connected", current_player_connected, d.GetAllocator());
     }
     d.AddMember("new_player", new_player, d.GetAllocator());

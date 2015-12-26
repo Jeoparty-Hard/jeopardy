@@ -108,8 +108,8 @@ void answer_screen::current_state(Document &d)
     d.AddMember("state", "answer", d.GetAllocator());
     Value answer;
     answer.SetObject();
-    answer.AddMember("type", Value(selected_answer->get_type().c_str(), selected_answer->get_type().size()), d.GetAllocator());
-    answer.AddMember("data", Value(selected_answer->get_data().c_str(), selected_answer->get_data().size()), d.GetAllocator());
+    answer.AddMember("type", Value(selected_answer->get_type(), d.GetAllocator()), d.GetAllocator());
+    answer.AddMember("data", Value(selected_answer->get_data(), d.GetAllocator()), d.GetAllocator());
     answer.AddMember("score", selected_answer->get_points(), d.GetAllocator());
     d.AddMember("answer", answer, d.GetAllocator());
     Value playersValue;
@@ -143,7 +143,7 @@ void answer_screen::make_buzzorder(GenericValue<UTF8<>> &root, Document::Allocat
         {
             time -= first_time;
         }
-        buzzorderEntry.AddMember("id", Value(player->get_id().c_str(), player->get_id().size()), allocator);
+        buzzorderEntry.AddMember("id", Value(player->get_id(), allocator), allocator);
         buzzorderEntry.AddMember("time", time.count(), allocator);
         root.PushBack(buzzorderEntry, allocator);
     }
@@ -169,7 +169,7 @@ void answer_screen::store_state(rapidjson::Document &root)
     buzzorderValue.SetArray();
     for (player *player : buzzorder)
     {
-        buzzorderValue.PushBack(Value(player->get_id().c_str(), player->get_id().size()), root.GetAllocator());
+        buzzorderValue.PushBack(Value(player->get_id(), root.GetAllocator()), root.GetAllocator());
     }
     root.AddMember("buzzorder", buzzorderValue, root.GetAllocator());
     root.AddMember("start", start.time_since_epoch().count(), root.GetAllocator());

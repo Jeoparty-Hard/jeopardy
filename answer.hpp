@@ -28,7 +28,7 @@ public:
     unsigned int get_points() const;
     unsigned int get_col() const;
     unsigned int get_row() const;
-    rapidjson::GenericValue<rapidjson::UTF8<>> winner_value() const;
+    rapidjson::GenericValue<rapidjson::UTF8<>> winner_value(rapidjson::GenericValue<rapidjson::UTF8<>>::AllocatorType &) const;
     void load_data();
 };
 

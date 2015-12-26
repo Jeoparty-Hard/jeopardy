@@ -28,6 +28,8 @@ set(SOURCE_FILES
 
 add_subdirectory(mediator)
 
+add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
+
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 if ( CMAKE_COMPILER_IS_GNUCC )

@@ -17,7 +17,7 @@ game_state::game_state(struct game_state_params *params)
 
 void game_state::store_state(Document &root)
 {
-    root.AddMember("round", Value(current_round.c_str(), current_round.size()), root.GetAllocator());
+    root.AddMember("round", Value(current_round, root.GetAllocator()), root.GetAllocator());
 
     Value playersValue;
     playersValue.SetArray();
@@ -37,7 +37,7 @@ void game_state::store_state(Document &root)
         categoryWinners.SetArray();
         for (const answer &answer : category.get_answers())
         {
-            categoryWinners.PushBack(answer.winner_value(), root.GetAllocator());
+            categoryWinners.PushBack(answer.winner_value(root.GetAllocator()), root.GetAllocator());
         }
         winnersValue.PushBack(categoryWinners, root.GetAllocator());
     }

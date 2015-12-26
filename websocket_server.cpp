@@ -131,12 +131,12 @@ void on_message(websocket_server *server, validators_t *validators, connection_h
         {
             Value errValue;
             errValue.SetObject();
-            errValue.AddMember("description", Value(error.description.c_str(), error.description.size()), d.GetAllocator());
+            errValue.AddMember("description", Value(error.description, d.GetAllocator()), d.GetAllocator());
             Value contextValue;
             contextValue.SetArray();
             for (auto &context : error.context)
             {
-                contextValue.PushBack(Value(context.c_str(), context.size()), d.GetAllocator());
+                contextValue.PushBack(Value(context, d.GetAllocator()), d.GetAllocator());
             }
             errValue.AddMember("context", contextValue, d.GetAllocator());
             errors.PushBack(errValue, d.GetAllocator());
@@ -149,7 +149,7 @@ void on_message(websocket_server *server, validators_t *validators, connection_h
         Document d;
         d.SetObject();
         d.AddMember("error", "jeopardy_exception", d.GetAllocator());
-        d.AddMember("message", Value(e.what(), string(e.what()).size()), d.GetAllocator());
+        d.AddMember("message", Value(e.what(), d.GetAllocator()), d.GetAllocator());
         server->broadcast(d);
     }
     catch (std::exception &e)
@@ -157,7 +157,7 @@ void on_message(websocket_server *server, validators_t *validators, connection_h
         Document d;
         d.SetObject();
         d.AddMember("error", "exception", d.GetAllocator());
-        d.AddMember("message", Value(e.what(), string(e.what()).size()), d.GetAllocator());
+        d.AddMember("message", Value(e.what(), d.GetAllocator()), d.GetAllocator());
         server->broadcast(d);
     }
 }
