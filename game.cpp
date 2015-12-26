@@ -205,7 +205,7 @@ void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<p
     {
         Value playerValue;
         playerValue.SetObject();
-        playerValue.AddMember("id", Value(player.get_id().c_str(), player.get_name().size()), allocator);
+        playerValue.AddMember("id", Value(player.get_id().c_str(), player.get_id().size()), allocator);
         playerValue.AddMember("name", Value(player.get_name().c_str(), player.get_name().size()), allocator);
         playerValue.AddMember("color", Value(player.get_color().string().c_str(), player.get_color().string().size()), allocator);
         playerValue.AddMember("score", player.get_score(), allocator);
