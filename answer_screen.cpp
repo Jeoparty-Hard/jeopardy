@@ -117,12 +117,14 @@ void answer_screen::current_state(Document &d)
 
 void answer_screen::make_buzzorder(GenericValue<UTF8<>> &root, Document::AllocatorType &allocator)
 {
-    root.SetObject();
+    root.SetArray();
     bool first_buzz = true;
     duration<int, milli> first_time;
     unique_lock<recursive_mutex> lock(buzzorder_mutex);
     for (player *player : buzzorder)
     {
+        Value buzzorderEntry;
+        buzzorderEntry.SetObject();
         if (!player->has_buzzed())
             continue;
         duration<int, milli> time;
@@ -136,7 +138,9 @@ void answer_screen::make_buzzorder(GenericValue<UTF8<>> &root, Document::Allocat
         {
             time -= first_time;
         }
-        root.AddMember(Value(player->get_id().c_str(), player->get_id().size()), Value(time.count()), allocator);
+        buzzorderEntry.AddMember("id", Value(player->get_id().c_str(), player->get_id().size()), allocator);
+        buzzorderEntry.AddMember("time", time.count(), allocator);
+        root.PushBack(buzzorderEntry, allocator);
     }
 }
 

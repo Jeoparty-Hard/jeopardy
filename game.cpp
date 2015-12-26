@@ -200,17 +200,18 @@ void game::make_scoreboard(GenericValue<rapidjson::UTF8<>> &root, const std::vec
 
 void game::list_players(GenericValue<rapidjson::UTF8<>> &root, const std::list<player> &players, GenericValue<UTF8<>>::AllocatorType &allocator)
 {
-    root.SetObject();
+    root.SetArray();
     for (const player &player : players)
     {
         Value playerValue;
         playerValue.SetObject();
+        playerValue.AddMember("id", Value(player.get_id().c_str(), player.get_name().size()), allocator);
         playerValue.AddMember("name", Value(player.get_name().c_str(), player.get_name().size()), allocator);
         playerValue.AddMember("color", Value(player.get_color().string().c_str(), player.get_color().string().size()), allocator);
         playerValue.AddMember("score", player.get_score(), allocator);
         playerValue.AddMember("buzzed", player.buzzed_value(), allocator);
         playerValue.AddMember("connected", player.is_connected(), allocator);
-        root.AddMember(Value(player.get_id().c_str(), player.get_id().size()), playerValue, allocator);
+        root.PushBack(playerValue, allocator);
     }
 }
 
