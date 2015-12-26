@@ -1,6 +1,7 @@
 #include "setup_game.hpp"
 
 #include "game.hpp"
+#include "invalid_event.hpp"
 #include "jeopardy_exception.hpp"
 #include "scoreboard.hpp"
 
@@ -25,7 +26,7 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
     if (event_type == "add_player")
     {
         if (edit_player_active)
-            return false;
+            throw invalid_event();
         edit_player_active = true;
         current_playername = "";
         current_player_connected = false;
@@ -33,20 +34,22 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
         Document d;
         current_state(d);
         server.broadcast(d);
+        return false;
     }
     else if (event_type == "update_player_name")
     {
         if (!edit_player_active)
-            return false;
+            throw invalid_event();
         current_playername = event["name"].GetString();
         Document d;
         current_state(d);
         server.broadcast(d);
+        return false;
     }
     else if (event_type == "confirm_player")
     {
         if (!edit_player_active)
-            return false;
+            throw invalid_event();
         if (!current_player_connected)
             throw jeopardy_exception("The player doesn't have a buzzer assigned");
         edit_player_active = false;
@@ -54,35 +57,37 @@ bool setup_game::process_event(const GenericValue<UTF8<>> &event)
         Document d;
         current_state(d);
         server.broadcast(d);
+        return true;
     }
     else if (event_type == "start")
     {
         if (edit_player_active)
-            return false;
+            throw invalid_event();
         if (players.size() < 1)
             throw jeopardy_exception("At least one player is required to start the game");
         next_state.reset(new scoreboard(params));
+        return true;
     }
     else
     {
-        return false;
+        throw invalid_event();
     }
-    return true;
 }
 
-void setup_game::on_buzz(const buzzer &buzzer)
+bool setup_game::on_buzz(const buzzer &buzzer)
 {
     if (!edit_player_active)
-        return;
+        return false;
     if (current_player_connected)
-        return;
+        return false;
     if (find_if(players.begin(), players.end(), [buzzer](const player &player){return player.is_connected() && buzzer == player.get_buzzer();}) != players.end())
-        return;
+        return false;
     current_player_connected = true;
     current_player_buzzer = buzzer;
     Document d;
     current_state(d);
     server.broadcast(d);
+    return false;
 }
 
 void setup_game::current_state(rapidjson::Document &d)

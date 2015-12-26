@@ -27,8 +27,8 @@ private:
     void on_buzzer_disconnected(const buzzer &);
     void on_buzzer_hit(const buzzer &);
     void store_state();
-    void process_client_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &);
-    void process_buzzer_hit(const buzzer &);
+    bool process_client_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &);
+    bool process_buzzer_hit(const buzzer &);
 public:
     game(int port);
     static void make_scoreboard(rapidjson::GenericValue<rapidjson::UTF8<>> &, const std::vector<category> &categories, rapidjson::GenericValue<rapidjson::UTF8<>>::AllocatorType &allocator);

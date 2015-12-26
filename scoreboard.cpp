@@ -2,6 +2,7 @@
 
 #include "answer_screen.hpp"
 #include "game.hpp"
+#include "invalid_event.hpp"
 #include "jeopardy_exception.hpp"
 
 using namespace std;
@@ -40,17 +41,17 @@ bool scoreboard::process_event(const GenericValue<UTF8<>> &event)
         {
             throw jeopardy_exception("Answer " + to_string(category_id) + "," + to_string(answer_id) + " does not exist");
         }
+        return true;
     }
     else
     {
-        return false;
+        throw invalid_event();
     }
-    return true;
 }
 
-void scoreboard::on_buzz(const buzzer &)
+bool scoreboard::on_buzz(const buzzer &)
 {
-    // Nothing to do
+    return false;
 }
 
 void scoreboard::current_state(rapidjson::Document &d)

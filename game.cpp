@@ -9,6 +9,7 @@
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/prettywriter.h>
 
+#include "invalid_event.hpp"
 #include "jeopardy_exception.hpp"
 #include "new_game.hpp"
 
@@ -42,11 +43,12 @@ void game::on_client_connect(websocketpp::connection_hdl hdl)
 
 void game::on_client_event(const GenericValue<UTF8<>> &event)
 {
-    process_client_event(event);
-    store_state();
+    bool state_changed = process_client_event(event);
+    if (state_changed)
+        store_state();
 }
 
-void game::process_client_event(const GenericValue<UTF8<>> &event)
+bool game::process_client_event(const GenericValue<UTF8<>> &event)
 {
     string event_type = event["event"].GetString();
     if (event_type == "connect_buzzergroup")
@@ -66,48 +68,56 @@ void game::process_client_event(const GenericValue<UTF8<>> &event)
             throw jeopardy_exception("Unexpected buzzergroup type '" + device_type_string + "'");
         }
         buzzer_manager.connect(event["device"].GetString(), type);
-        return;
+        return false;
     }
     if (event_type == "reconnect")
     {
         string player_id = event["player"].GetString();
         auto it = find_if(data.players.begin(), data.players.end(), [player_id](const player &player){return player.get_id() == player_id;});
         if (it == data.players.end())
-            return;
+            return false;
         player &player = *it;
         if (player.is_connected())
             throw jeopardy_exception("Player '" + player.get_name() + "' is already connected");
         if (reconnect_player != nullptr)
             throw jeopardy_exception("Player '" + reconnect_player->get_name() + "' is currently connecting");
         reconnect_player = &player;
-        return;
+        return false;
     }
     if (event_type == "refresh")
     {
         Document d;
         state->current_state(d);
         data.server.broadcast(d);
-        return;
+        return false;
     }
-    if (!state->process_event(event))
-        throw jeopardy_exception("Event '" + string(event["event"].GetString()) + "' not allowed in this state");
-    if (data.next_state)
+    try
     {
-        state.reset(data.next_state.release());
-        state->initialize();
-        Document d;
-        state->current_state(d);
-        data.server.broadcast(d);
+        bool state_changed = state->process_event(event);
+        if (data.next_state)
+        {
+            state.reset(data.next_state.release());
+            state->initialize();
+            Document d;
+            state->current_state(d);
+            data.server.broadcast(d);
+        }
+        return state_changed;
+    }
+    catch (invalid_json &)
+    {
+        throw jeopardy_exception("Event '" + string(event["event"].GetString()) + "' not allowed in this state");
     }
 }
 
 void game::on_buzzer_hit(const buzzer &buzzer_hit)
 {
-    process_buzzer_hit(buzzer_hit);
-    store_state();
+    bool state_changed = process_buzzer_hit(buzzer_hit);
+    if (state_changed)
+        store_state();
 }
 
-void game::process_buzzer_hit(const buzzer &buzzer_hit)
+bool game::process_buzzer_hit(const buzzer &buzzer_hit)
 {
     if (reconnect_player != nullptr)
     {
@@ -119,10 +129,10 @@ void game::process_buzzer_hit(const buzzer &buzzer_hit)
             Document d;
             state->current_state(d);
             data.server.broadcast(d);
-            return;
+            return false;
         }
     }
-    state->on_buzz(buzzer_hit);
+    return state->on_buzz(buzzer_hit);
 }
 
 void game::on_buzzer_disconnected(const buzzer &disconnected_buzzer)

@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "game.hpp"
+#include "invalid_event.hpp"
 #include "scoreboard.hpp"
 
 using namespace std;
@@ -34,36 +35,39 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
     {
         unique_lock<recursive_mutex> lock(buzzorder_mutex);
         if (buzzorder.size() == 0)
-            return false;
+            throw invalid_event();
         player *player = *buzzorder.begin();
         player->add_score(selected_answer->get_points());
         selected_answer->set_winner(player);
         next_state.reset(new scoreboard(player, params));
+        return true;
     }
     else if (event_type == "fail")
     {
         unique_lock<recursive_mutex> lock(buzzorder_mutex);
         if (buzzorder.size() == 0)
-            return false;
+            throw invalid_event();
         player *player = *buzzorder.begin();
         player->add_score(-selected_answer->get_points());
         // TODO Inform clients about new score
         initialize();
         send_buzzorder();
+        return true;
     }
     else if (event_type == "oops")
     {
         unique_lock<recursive_mutex> lock(buzzorder_mutex);
         if (buzzorder.size() == 0)
-            return false;
+            throw invalid_event();
         initialize();
         send_buzzorder();
+        return true;
     }
     else if (event_type == "exit")
     {
         unique_lock<recursive_mutex> lock(buzzorder_mutex);
         if (buzzorder.size() > 0)
-            return false;
+            throw invalid_event();
         player *next_player = nullptr;
         for (player &player : players)
         {
@@ -74,27 +78,28 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         }
         selected_answer->set_winner(nullptr);
         next_state.reset(new scoreboard(next_player, params));
+        return true;
     }
     else
     {
-        return false;
+        throw invalid_event();
     }
-    return true;
 }
 
-void answer_screen::on_buzz(const buzzer &hit_buzzer)
+bool answer_screen::on_buzz(const buzzer &hit_buzzer)
 {
     duration<int, milli> time = duration_cast<milliseconds>(high_resolution_clock::now() - start);
     auto it = find_if(players.begin(), players.end(), [hit_buzzer](const class player &player){return player.is_connected() && player.get_buzzer() == hit_buzzer;});
     if (it == players.end())
-        return;
+        return false;
     player &player = *it;
     if (player.has_buzzed())
-        return;
+        return false;
     player.set_buzztime(time);
     unique_lock<recursive_mutex> lock(buzzorder_mutex);
     buzzorder.push_back(&player);
     send_buzzorder();
+    return true;
 }
 
 void answer_screen::current_state(Document &d)

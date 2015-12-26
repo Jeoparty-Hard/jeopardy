@@ -1,5 +1,6 @@
 #include "new_game.hpp"
 
+#include "invalid_event.hpp"
 #include "jeopardy_exception.hpp"
 #include "round_loader.hpp"
 #include "setup_game.hpp"
@@ -48,12 +49,15 @@ bool new_game::process_event(const GenericValue<UTF8<>> &event)
         }
         return true;
     }
-    return false;
+    else
+    {
+        throw invalid_event();
+    }
 }
 
-void new_game::on_buzz(const buzzer &buzzer)
+bool new_game::on_buzz(const buzzer &buzzer)
 {
-    // Nothing to do
+    return false;
 }
 
 void new_game::current_state(rapidjson::Document &d)

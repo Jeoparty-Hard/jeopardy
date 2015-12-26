@@ -13,6 +13,7 @@ set(SOURCE_FILES
         color.cpp
         game.cpp
         game_state.cpp
+        invalid_event.cpp
         invalid_json.cpp
         jeopardy_exception.cpp
         jeopardy_round.cpp
