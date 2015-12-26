@@ -29,8 +29,8 @@ game::game(int port)
     data.server.connection_open.connect(bind(&game::on_client_connect, this, placeholders::_1));
     data.server.client_event.connect(bind(&game::on_client_event, this, placeholders::_1));
     data.server.start_listen(port);
-    data.server.run();
     cout << "Listening..." << endl;
+    data.server.run();
 }
 
 void game::on_client_connect(websocketpp::connection_hdl hdl)
