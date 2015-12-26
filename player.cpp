@@ -1,6 +1,7 @@
 #include "player.hpp"
 
 using namespace std;
+using namespace std::chrono;
 using namespace rapidjson;
 
 player::player(string id, string name, color c, const buzzer &buzzer)
@@ -15,7 +16,18 @@ player::player(string id, string name, color c, const buzzer &buzzer)
     this->buzzed = false;
 }
 
-void player::set_buzztime(const std::chrono::duration<int, std::milli> &buzztime)
+player::player(const GenericValue<UTF8<>> &root)
+{
+    this->id = root["id"].GetString();
+    this->name = root["name"].GetString();
+    this->c = color(root["color"].GetString());
+    this->score = root["score"].GetInt();
+    this->buzzed = root["buzzed"].GetBool();
+    this->buzztime = duration<int, milli>(root["buzztime"].GetInt());
+    this->connected = false;
+}
+
+void player::set_buzztime(const duration<int, milli> &buzztime)
 {
     this->buzzed = true;
     this->buzztime = buzztime;

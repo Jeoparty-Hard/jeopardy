@@ -13,6 +13,7 @@ private:
     std::map<std::string, jeopardy_round> rounds;
 public:
     new_game(struct game_state_params *params);
+    new_game(const rapidjson::GenericValue<rapidjson::UTF8<>> &, struct game_state_params *params);
     virtual ~new_game() = default;
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);

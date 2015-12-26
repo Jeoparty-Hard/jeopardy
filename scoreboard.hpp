@@ -10,6 +10,7 @@ private:
 public:
     scoreboard(struct game_state_params *params);
     scoreboard(player *current_player, struct game_state_params *params);
+    scoreboard(const rapidjson::GenericValue<rapidjson::UTF8<>> &, struct game_state_params *params);
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);
     virtual bool on_buzz(const buzzer &);

@@ -15,6 +15,13 @@ setup_game::setup_game(struct game_state_params *params)
     this->edit_player_active = false;
 }
 
+setup_game::setup_game(const rapidjson::GenericValue<rapidjson::UTF8<>> &root, struct game_state_params *params)
+    : game_state(root, params)
+{
+    this->next_player_id = root["next_player_id"].GetInt();
+    this->edit_player_active = false;
+}
+
 void setup_game::initialize()
 {
     // Nothing to do
@@ -115,4 +122,5 @@ void setup_game::store_state(rapidjson::Document &root)
 {
     root.AddMember("state", "setup_game", root.GetAllocator());
     game_state::store_state(root);
+    root.AddMember("next_player_id", next_player_id, root.GetAllocator());
 }

@@ -20,6 +20,16 @@ scoreboard::scoreboard(struct game_state_params *params)
     // Nothing to do
 }
 
+scoreboard::scoreboard(const rapidjson::GenericValue<rapidjson::UTF8<>> &root, struct game_state_params *params)
+    : game_state(root, params)
+{
+    string current_player_id = root["current_player"].GetString();
+    auto it = find_if(players.begin(), players.end(), [current_player_id](const player &player){return player.get_id() == current_player_id;});
+    if (it == players.end())
+        throw invalid_json("id of current player is invalid");
+    this->current_player = &*it;
+}
+
 void scoreboard::initialize()
 {
     if (current_player == nullptr)

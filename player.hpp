@@ -22,6 +22,7 @@ private:
     std::chrono::duration<int, std::milli> buzztime;
 public:
     player(std::string id, std::string name, color, const buzzer &);
+    player(const rapidjson::GenericValue<rapidjson::UTF8<>> &);
     void set_buzztime(const std::chrono::duration<int, std::milli> &);
     void reset_buzztime();
     void add_score(int score);

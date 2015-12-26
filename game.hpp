@@ -29,6 +29,8 @@ private:
     void store_state();
     bool process_client_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &);
     bool process_buzzer_hit(const buzzer &);
+    bool stored_state_exists();
+    game_state *load_state();
 public:
     game(int port);
     static void make_scoreboard(rapidjson::GenericValue<rapidjson::UTF8<>> &, const std::vector<category> &categories, rapidjson::GenericValue<rapidjson::UTF8<>>::AllocatorType &allocator);

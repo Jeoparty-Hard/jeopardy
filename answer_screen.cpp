@@ -17,6 +17,29 @@ answer_screen::answer_screen(answer *selected_answer, struct game_state_params *
     this->selected_answer = selected_answer;
 }
 
+answer_screen::answer_screen(const GenericValue<UTF8<>> &root, struct game_state_params *params)
+    : game_state(root, params)
+{
+    try
+    {
+        this->selected_answer = &categories.at(root["answer_col"].GetInt()).get_mutable_answers().at(root["answer_row"].GetInt());
+    }
+    catch (out_of_range &)
+    {
+        throw invalid_json("Illegal answer");
+    }
+    auto &buzzorder_value = root["buzzorder"];
+    for (unsigned int i = 0;i < buzzorder_value.Capacity();i++)
+    {
+        string player_id = buzzorder_value[i].GetString();
+        auto it = find_if(players.begin(), players.end(), [player_id](const player &player){return player.get_id() == player_id;});
+        if (it == players.end())
+            throw invalid_json("Buzzorder player does not exist");
+        buzzorder.push_back(&*it);
+    }
+    start = time_point<high_resolution_clock>(time_point<high_resolution_clock>::duration(root["start"].GetInt64()));
+}
+
 void answer_screen::initialize()
 {
     for (player &player : players)

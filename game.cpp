@@ -7,13 +7,18 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <rapidjson/error/en.h>
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/prettywriter.h>
+#include <valijson/utils/file_utils.hpp>
 
 #include "data_loader.hpp"
 #include "invalid_event.hpp"
 #include "jeopardy_exception.hpp"
 #include "new_game.hpp"
+#include "setup_game.hpp"
+#include "scoreboard.hpp"
+#include "answer_screen.hpp"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -28,7 +33,15 @@ game::game(int port)
     buzzer_manager.buzzergroup_connected.connect(bind(&game::on_buzzergroup_connected, this, placeholders::_1, placeholders::_2));
     buzzer_manager.buzzergroup_connect_failed.connect(bind(&game::on_buzzergroup_connect_failed, this, placeholders::_1, placeholders::_2));
     buzzer_manager.buzzergroup_disconnected.connect(bind(&game::on_buzzergroup_disconnected, this, placeholders::_1, placeholders::_2));
-    state.reset(new new_game(&data));
+    if (stored_state_exists())
+    {
+        state.reset(load_state());
+    }
+    else
+    {
+        state.reset(new new_game(&data));
+        state->initialize();
+    }
     list<pair<string, device_type>> default_devices = data_loader::load_default_devices();
     for (pair<string, device_type> &device : default_devices)
     {
@@ -282,4 +295,36 @@ void game::store_state()
     }
     boost::filesystem::ofstream out_file(current_state_file);
     out_file.write(buffer.GetString(), buffer.GetSize());
+}
+
+bool game::stored_state_exists()
+{
+    path states_folder = "states";
+    if (!is_directory(states_folder))
+        return false;
+    if (!exists(states_folder / "current_state.json"))
+        return false;
+    return true;
+}
+
+game_state* game::load_state()
+{
+    path state_file = path("states") / "current_state.json";
+    string json;
+    valijson::utils::loadFile(state_file.string(), json);
+    Document d;
+    d.Parse(json.c_str());
+    if (d.HasParseError())
+        throw jeopardy_exception(string("Cannot parse current state: ")  + GetParseError_En(d.GetParseError()));
+
+    string state_name = d["state"].GetString();
+    if (state_name == "new_game")
+        return new new_game(d, &data);
+    if (state_name == "setup_game")
+        return new setup_game(d, &data);
+    if (state_name == "scoreboard")
+        return new scoreboard(d, &data);
+    if (state_name == "answer_screen")
+        return new answer_screen(d, &data);
+    throw invalid_json("Unknown state '" + state_name + "'");
 }

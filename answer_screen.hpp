@@ -15,6 +15,7 @@ private:
     std::recursive_mutex buzzorder_mutex;
 public:
     answer_screen(answer *selected_answer, struct game_state_params *params);
+    answer_screen(const rapidjson::GenericValue<rapidjson::UTF8<>> &, struct game_state_params *params);
     virtual ~answer_screen() = default;
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);

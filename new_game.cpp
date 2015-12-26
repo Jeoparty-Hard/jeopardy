@@ -18,6 +18,15 @@ new_game::new_game(struct game_state_params *params)
     }
 }
 
+new_game::new_game(const rapidjson::GenericValue<rapidjson::UTF8<>> &root, struct game_state_params *params)
+    : game_state(root, params)
+{
+    for (jeopardy_round &round : data_loader::load_rounds())
+    {
+        rounds.emplace(round.get_id(), move(round));
+    }
+}
+
 void new_game::initialize()
 {
     players.clear();
@@ -41,6 +50,7 @@ bool new_game::process_event(const GenericValue<UTF8<>> &event)
                     answer.load_data();
                 }
             }
+            current_round = round_id;
             next_state.reset(new setup_game(params));
         }
         catch (out_of_range &)

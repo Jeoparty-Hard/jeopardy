@@ -25,6 +25,7 @@ protected:
     struct game_state_params *params;
 public:
     game_state(struct game_state_params *);
+    game_state(const rapidjson::GenericValue<rapidjson::UTF8<>> &, struct game_state_params *);
     virtual ~game_state() = default;
     virtual void initialize() = 0;
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event) = 0;

@@ -14,6 +14,7 @@ private:
     buzzer current_player_buzzer;
 public:
     setup_game(struct game_state_params *params);
+    setup_game(const rapidjson::GenericValue<rapidjson::UTF8<>> &, struct game_state_params *params);
     virtual ~setup_game() = default;
     virtual void initialize();
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);
