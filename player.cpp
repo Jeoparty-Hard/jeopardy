@@ -4,7 +4,8 @@ using namespace std;
 using namespace rapidjson;
 
 player::player(string id, string name, color c, const buzzer &buzzer)
-    : mybuzzer(buzzer)
+    : mybuzzer(buzzer),
+      buzztime(0)
 {
     this->id = id;
     this->name = name;
