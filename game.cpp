@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/prettywriter.h>
 
