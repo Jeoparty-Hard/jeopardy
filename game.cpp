@@ -104,6 +104,19 @@ bool game::process_client_event(const GenericValue<UTF8<>> &event)
         data.server.broadcast(d);
         return false;
     }
+    if (event_type == "update_score")
+    {
+        string player_id = event["player"].GetString();
+        auto it = find_if(data.players.begin(), data.players.end(), [player_id](const player &player){return player.get_id() == player_id;});
+        if (it == data.players.end())
+            throw jeopardy_exception("Player with id '" + player_id + "' does not exist");
+        player &player = *it;
+        player.set_score(event["score"].GetInt());
+        Document d;
+        state->current_state(d);
+        data.server.broadcast(d);
+        return true;
+    }
     try
     {
         bool state_changed = state->process_event(event);

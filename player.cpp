@@ -31,6 +31,11 @@ void player::add_score(int score)
     this->score += score;
 }
 
+void player::set_score(int score)
+{
+    this->score = score;
+}
+
 void player::set_buzzer(const buzzer &mybuzzer)
 {
     this->mybuzzer = mybuzzer;
