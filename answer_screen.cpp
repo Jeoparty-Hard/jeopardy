@@ -68,17 +68,10 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         unique_lock<recursive_mutex> lock(buzzorder_mutex);
         if (buzzorder.size() > 0)
             throw invalid_event();
-        player *next_player = nullptr;
-        for (player &player : players)
-        {
-            if (next_player == nullptr)
-                next_player = &player;
-            else if (player.get_score() < next_player->get_score())
-                next_player = &player;
-        }
-        selected_answer->set_winner(nullptr);
-        player *lowest_score_player = &*min_element(players.begin(), players.end(), [](const player &player1, const player &player2){return player1.get_score() < player2.get_score();});
-        next_state.reset(new scoreboard(lowest_score_player, params));
+        player *next_player = &*min_element(players.begin(), players.end(), [](const player &player1, const player &player2){return player1.get_score() < player2.get_score();});
+        if (!selected_answer->is_won())
+            selected_answer->set_winner(nullptr);
+        next_state.reset(new scoreboard(next_player, params));
         return true;
     }
     else

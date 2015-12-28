@@ -22,6 +22,7 @@ private:
 public:
     answer() = default;
     answer(const rapidjson::GenericValue<rapidjson::UTF8<>> &, boost::filesystem::path category_path, unsigned int points, unsigned int col, unsigned int row);
+    bool is_won() const;
     void set_winner(player *winner);
     const std::string & get_type() const;
     const std::string & get_data() const;

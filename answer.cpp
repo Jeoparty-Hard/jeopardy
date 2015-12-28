@@ -22,6 +22,11 @@ answer::answer(const GenericValue<UTF8<>> &answer, path category_path, unsigned 
     this->winner = nullptr;
 }
 
+bool answer::is_won() const
+{
+    return has_winner;
+}
+
 void answer::set_winner(player *winner)
 {
     this->has_winner = true;
