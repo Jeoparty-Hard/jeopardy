@@ -77,7 +77,8 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
                 next_player = &player;
         }
         selected_answer->set_winner(nullptr);
-        next_state.reset(new scoreboard(next_player, params));
+        player *lowest_score_player = &*min_element(players.begin(), players.end(), [](const player &player1, const player &player2){return player1.get_score() < player2.get_score();});
+        next_state.reset(new scoreboard(lowest_score_player, params));
         return true;
     }
     else
