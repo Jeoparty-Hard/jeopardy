@@ -76,13 +76,25 @@ bool game::process_client_event(const GenericValue<UTF8<>> &event)
         string player_id = event["player"].GetString();
         auto it = find_if(data.players.begin(), data.players.end(), [player_id](const player &player){return player.get_id() == player_id;});
         if (it == data.players.end())
-            return false;
+            throw invalid_json("Player with id '" + player_id + "' does not exist");
         player &player = *it;
         if (player.is_connected())
             throw jeopardy_exception("Player '" + player.get_name() + "' is already connected");
         if (reconnect_player != nullptr)
             throw jeopardy_exception("Player '" + reconnect_player->get_name() + "' is currently connecting");
         reconnect_player = &player;
+        return false;
+    }
+    if (event_type == "disconnect")
+    {
+        string player_id = event["player"].GetString();
+        auto it = find_if(data.players.begin(), data.players.end(), [player_id](const player &player){return player.get_id() == player_id;});
+        if (it == data.players.end())
+            throw jeopardy_exception("Player with id '" + player_id + "' does not exist");
+        player &player = *it;
+        if (!player.is_connected())
+            throw jeopardy_exception("Player '" + player.get_name() + "' is not connected");
+        player.disconnect();
         return false;
     }
     if (event_type == "refresh")
