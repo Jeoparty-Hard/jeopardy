@@ -20,9 +20,9 @@ public:
     virtual bool process_event(const rapidjson::GenericValue<rapidjson::UTF8<>> &event);
     virtual bool on_buzz(const buzzer &);
     virtual void current_state(rapidjson::Document &);
+    virtual void current_state(rapidjson::Document &, bool send_data);
     virtual void store_state(rapidjson::Document &);
     void make_buzzorder(rapidjson::GenericValue<rapidjson::UTF8<>> &, rapidjson::Document::AllocatorType &);
-    void send_buzzorder();
 };
 
 #endif //JEOPARDY_ANSWER_SCREEN_H

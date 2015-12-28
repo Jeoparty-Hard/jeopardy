@@ -51,7 +51,9 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         player->add_score(-selected_answer->get_points());
         // TODO Inform clients about new score
         initialize();
-        send_buzzorder();
+        Document d;
+        current_state(d, false);
+        server.broadcast(d);
         return true;
     }
     else if (event_type == "oops")
@@ -60,7 +62,9 @@ bool answer_screen::process_event(const GenericValue<UTF8<>> &event)
         if (buzzorder.size() == 0)
             throw invalid_event();
         initialize();
-        send_buzzorder();
+        Document d;
+        current_state(d, false);
+        server.broadcast(d);
         return true;
     }
     else if (event_type == "exit")
@@ -92,18 +96,26 @@ bool answer_screen::on_buzz(const buzzer &hit_buzzer)
     player.set_buzztime(time);
     unique_lock<recursive_mutex> lock(buzzorder_mutex);
     buzzorder.push_back(&player);
-    send_buzzorder();
+    Document d;
+    current_state(d, false);
+    server.broadcast(d);
     return true;
 }
 
-void answer_screen::current_state(Document &d)
+void answer_screen::current_state(rapidjson::Document &d)
+{
+    current_state(d, true);
+}
+
+void answer_screen::current_state(Document &d, bool send_data)
 {
     d.SetObject();
     d.AddMember("state", "answer", d.GetAllocator());
     Value answer;
     answer.SetObject();
     answer.AddMember("type", Value(selected_answer->get_type(), d.GetAllocator()), d.GetAllocator());
-    answer.AddMember("data", Value(selected_answer->get_data(), d.GetAllocator()), d.GetAllocator());
+    if (send_data)
+        answer.AddMember("data", Value(selected_answer->get_data(), d.GetAllocator()), d.GetAllocator());
     answer.AddMember("score", selected_answer->get_points(), d.GetAllocator());
     d.AddMember("answer", answer, d.GetAllocator());
     Value playersValue;
@@ -141,16 +153,6 @@ void answer_screen::make_buzzorder(GenericValue<UTF8<>> &root, Document::Allocat
         buzzorderEntry.AddMember("time", time.count(), allocator);
         root.PushBack(buzzorderEntry, allocator);
     }
-}
-
-void answer_screen::send_buzzorder()
-{
-    Document d;
-    d.SetObject();
-    Value buzzorderValue;
-    make_buzzorder(buzzorderValue, d.GetAllocator());
-    d.AddMember("buzzorder", buzzorderValue, d.GetAllocator());
-    server.broadcast(d);
 }
 
 void answer_screen::store_state(rapidjson::Document &root)
