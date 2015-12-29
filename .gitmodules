@@ -1,6 +1,6 @@
 [submodule "mediator"]
 	path = mediator
-	url = gitlab@git.brn.li:jeopardy/mediator.git
+	url = https://github.com/Jeoparty/mediator.git
 [submodule "json-schema"]
 	path = json-schema
-	url = gitlab@git.brn.li:jeopardy/json-schema.git
+	url = https://github.com/Jeoparty/json-schema.git
