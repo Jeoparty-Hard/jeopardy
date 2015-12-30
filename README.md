@@ -1,8 +1,9 @@
 # Dependencies
 * boost
-* rapidjson
+* rapidjson >= v1.0
 * websocketpp
 * valijson (https://github.com/tristanpenman/valijson)
 
-## PKGBUILD für Valijson
-Valijson kann über das pkgbuild https://git.ccn.li/manuel/pkgbuilds/src/master/valijson/PKGBUILD installiert werden
+## PKGBUILD for Valijson
+Valijson can be installed using the pkgbuild 
+https://git.ccn.li/manuel/pkgbuilds/src/master/valijson/PKGBUILD
