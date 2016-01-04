@@ -1,0 +1,20 @@
+language: cpp
+compiler: gcc
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository -y ppa:boost-latest/ppa
+  - sudo apt-get update -q
+  - sudo apt-get install -y g++-5 libboost1.55-dev libboost-system1.55-dev libboost-filesystem1.55-dev libboost-regex1.55-dev
+  - wget https://github.com/zaphoyd/websocketpp/archive/0.6.0.zip -O /tmp/websocketpp.zip
+  - unzip /tmp/websocketpp.zip
+  - export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$PWD/websocketpp-0.6.0/
+  - wget https://github.com/miloyip/rapidjson/archive/v1.0.2.zip -O /tmp/rapidjson.zip
+  - unzip /tmp/rapidjson.zip
+  - export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$PWD/rapidjson-1.0.2/include
+  - wget https://github.com/tristanpenman/valijson/archive/master.zip -O /tmp/valijson.zip
+  - unzip /tmp/valijson.zip
+  - export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$PWD/valijson-master/include
+  - export CXX=g++-5
+  - export CC=gcc-5
+script: cmake . && make
+
