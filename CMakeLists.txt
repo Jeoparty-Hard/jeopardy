@@ -11,6 +11,7 @@ set(SOURCE_FILES
         base64.cpp
         category.cpp
         color.cpp
+        data_loader.cpp
         game.cpp
         game_state.cpp
         invalid_event.cpp
@@ -20,7 +21,6 @@ set(SOURCE_FILES
         main.cpp
         new_game.cpp
         player.cpp
-        round_loader.cpp
         scoreboard.cpp
         setup_game.cpp
         websocket_server.cpp

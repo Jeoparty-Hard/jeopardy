@@ -2,7 +2,7 @@
 
 #include "invalid_event.hpp"
 #include "jeopardy_exception.hpp"
-#include "round_loader.hpp"
+#include "data_loader.hpp"
 #include "setup_game.hpp"
 
 using namespace std;
@@ -12,7 +12,7 @@ using namespace rapidjson;
 new_game::new_game(struct game_state_params *params)
     : game_state(params)
 {
-    for (jeopardy_round &round : round_loader::load_rounds())
+    for (jeopardy_round &round : data_loader::load_rounds())
     {
         rounds.emplace(round.get_id(), move(round));
     }

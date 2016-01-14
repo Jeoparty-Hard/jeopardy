@@ -1,4 +1,4 @@
-#include "round_loader.hpp"
+#include "data_loader.hpp"
 
 #include <iostream>
 #include <string>
@@ -63,7 +63,7 @@ static jeopardy_round load_round(const path &round_directory, Validator &validat
     return jeopardy_round(jeopardy_round(round_directory.filename().string(), d, round_directory));
 }
 
-list<jeopardy_round> round_loader::load_rounds()
+list<jeopardy_round> data_loader::load_rounds()
 {
     path rounds_dir = "rounds";
     if (!is_directory(rounds_dir))
@@ -90,7 +90,7 @@ list<jeopardy_round> round_loader::load_rounds()
     return rounds;
 }
 
-jeopardy_round round_loader::load_round(const std::string &name)
+jeopardy_round data_loader::load_round(const std::string &name)
 {
     path rounds_dir = "rounds";
     if (!is_directory(rounds_dir))
