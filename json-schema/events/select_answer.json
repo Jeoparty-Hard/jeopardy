@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": ["event", "category", "answer"],
+  "properties": {
+    "event": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "answer": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

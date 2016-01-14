@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": ["event", "type", "device"],
+  "properties": {
+    "event": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "enum": ["serial", "keyboard"]
+    },
+    "device": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

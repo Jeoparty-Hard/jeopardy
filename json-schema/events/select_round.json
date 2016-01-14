@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": ["event", "round"],
+  "properties": {
+    "event": {
+      "type": "string",
+      "minLength": 1
+    },
+    "round": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

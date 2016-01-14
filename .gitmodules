@@ -1,6 +1,3 @@
 [submodule "mediator"]
 	path = mediator
 	url = https://github.com/Jeoparty/mediator.git
-[submodule "json-schema"]
-	path = json-schema
-	url = https://github.com/Jeoparty/json-schema.git
