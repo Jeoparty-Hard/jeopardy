@@ -2,3 +2,4 @@
 build/
 rounds/
 states/
+default_devices.json

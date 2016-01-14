@@ -10,6 +10,7 @@
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/prettywriter.h>
 
+#include "data_loader.hpp"
 #include "invalid_event.hpp"
 #include "jeopardy_exception.hpp"
 #include "new_game.hpp"
@@ -28,6 +29,11 @@ game::game(int port)
     buzzer_manager.buzzergroup_connect_failed.connect(bind(&game::on_buzzergroup_connect_failed, this, placeholders::_1, placeholders::_2));
     buzzer_manager.buzzergroup_disconnected.connect(bind(&game::on_buzzergroup_disconnected, this, placeholders::_1, placeholders::_2));
     state.reset(new new_game(&data));
+    list<pair<string, device_type>> default_devices = data_loader::load_default_devices();
+    for (pair<string, device_type> &device : default_devices)
+    {
+        buzzer_manager.connect(device.first, device.second);
+    }
     data.server.connection_open.connect(bind(&game::on_client_connect, this, placeholders::_1));
     data.server.client_event.connect(bind(&game::on_client_event, this, placeholders::_1));
     data.server.start_listen(port);
@@ -193,6 +199,7 @@ void game::on_buzzergroup_connect_failed(std::string device, std::string error_m
     d.AddMember("device", Value(device, d.GetAllocator()), d.GetAllocator());
     d.AddMember("message", Value(error_message, d.GetAllocator()), d.GetAllocator());
     data.server.broadcast(d);
+    cerr << "Failed to connect '" << device << "': " << error_message << endl;
 }
 
 void game::on_buzzergroup_disconnected(std::string device, disconnect_reason reason)

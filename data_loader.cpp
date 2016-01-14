@@ -20,9 +20,8 @@ using namespace rapidjson;
 using namespace valijson;
 using namespace valijson::adapters;
 
-static Schema initialize_schema()
+static Schema initialize_schema(path schema_file)
 {
-    path schema_file = path("json-schema") / "files" / "round.json";
     if (!is_regular_file(schema_file))
         throw jeopardy_exception("'" + schema_file.string() + "' is not a regular file");
     Document schema_doc;
@@ -44,9 +43,14 @@ static jeopardy_round load_round(const path &round_directory, Validator &validat
     if (!is_directory(round_directory))
         throw jeopardy_exception("'" + round_directory.string() + "' is not a directory");
 
-    path json_file = round_directory / "round.json";
+    Document d = data_loader::load_validated_document(round_directory / "round.json", validator);
+    return jeopardy_round(jeopardy_round(round_directory.filename().string(), d, round_directory));
+}
+
+Document data_loader::load_validated_document(const path &json_file, Validator &validator)
+{
     if (!is_regular_file(json_file))
-        throw jeopardy_exception("'" + round_directory.string() + "' is not a file");
+        throw jeopardy_exception("'" + json_file.string() + "' is not a file");
 
     Document d;
     string json;
@@ -60,7 +64,7 @@ static jeopardy_round load_round(const path &round_directory, Validator &validat
     if (!validator.validate(targetAdapter, &results))
         throw invalid_json(results);
 
-    return jeopardy_round(jeopardy_round(round_directory.filename().string(), d, round_directory));
+    return d;
 }
 
 list<jeopardy_round> data_loader::load_rounds()
@@ -68,12 +72,12 @@ list<jeopardy_round> data_loader::load_rounds()
     path rounds_dir = "rounds";
     if (!is_directory(rounds_dir))
         throw jeopardy_exception("'" + rounds_dir.string() + "' is not a directory");
-    Validator validator(initialize_schema());
+    Validator validator(initialize_schema(path("json-schema") / "files" / "round.json"));
     list<jeopardy_round> rounds;
     for (directory_iterator it(rounds_dir), end;it != end;it++)
     {
         path current_directory = *it;
-        if (!is_directory(rounds_dir))
+        if (!is_directory(current_directory))
         {
             cerr << current_directory << " is not a directory" << endl;
             continue;
@@ -95,7 +99,34 @@ jeopardy_round data_loader::load_round(const std::string &name)
     path rounds_dir = "rounds";
     if (!is_directory(rounds_dir))
         throw jeopardy_exception("'" + rounds_dir.string() + "' is not a directory");
-    Validator validator(initialize_schema());
+    Validator validator(initialize_schema(path("json-schema") / "files" / "round.json"));
     path round_directory = rounds_dir / name;
     return ::load_round(round_directory, validator);
+}
+
+list<pair<string, device_type>> data_loader::load_default_devices()
+{
+    list<pair<string, device_type>> devices;
+    path device_file = "default_devices.json";
+    if (!is_regular_file(device_file))
+        return devices;
+    Validator validator(initialize_schema(path("json-schema") / "files" / "default_devices.json"));
+
+
+    Document d = load_validated_document(device_file, validator);
+    for (unsigned int i = 0;i < d.Capacity();i++)
+    {
+        auto &device = d[i];
+        string path = device["device"].GetString();
+        string type_str = device["type"].GetString();
+        device_type type;
+        if (type_str == "serial")
+            type = device_type::SERIAL;
+        else if (type_str == "keyboard")
+            type = device_type::KEYBOARD;
+        else
+            throw invalid_json("Invalid type '" + type_str + "' in default devices");
+        devices.emplace_back(path, type);
+    }
+    return devices;
 }
